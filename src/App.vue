@@ -44,7 +44,7 @@ const prepareData = (parameters, categories, hits) => {
   const summaryHits = Object.values(hits).reduce((hits, line) => {
     Object.entries(line).forEach(([id, count]) => {
       console.log(console.log)
-      if (has(hits, id)) {
+      if (!has(hits, id)) {
         hits[id] += count
       } else {
         hits[id] = count
