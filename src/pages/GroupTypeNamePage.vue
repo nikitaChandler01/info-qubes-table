@@ -11,15 +11,18 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   data: Object,
 });
 
-const rows = computed(() => []);
-const dataKeys = Object.keys(props.data);
-for (const key of dataKeys) {
+// const rows = computed(() => []);
+const rows = ref([])
+const dataKeys = computed(() => {
+  return Object.keys(props.data)
+});
+for (const key of dataKeys.value) {
   if (props.data[key].type.name === 'group') {
     const item = {};
     item.id = key;

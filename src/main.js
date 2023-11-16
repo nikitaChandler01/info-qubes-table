@@ -5,6 +5,7 @@ import PrimeVue from 'primevue/config';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import TabMenu from 'primevue/tabmenu';
+import Menubar from 'primevue/menubar';
 import 'primevue/resources/themes/lara-light-teal/theme.css';
 
 
@@ -15,4 +16,5 @@ app
   .component('DataTable', DataTable)
   .component('Column', Column)
   .component('TabMenu', TabMenu)
+    .component('Menubar', Menubar)
   .mount('#app');
