@@ -9,17 +9,18 @@
     <Column field="form.name" header="form name" />
   </DataTable>
 </template>
-<!--  вывести в таблицу name, is_negative, description, short_name, form, type -->
+
 <script setup>
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import { computed } from 'vue';
-
 const props = defineProps({
   data: Object,
 });
-const rows = computed(() =>
-  Object.keys(props.data).map((key) => {
+const rows = computed(() => []);
+const dataKeys = Object.keys(props.data);
+for (const key of dataKeys) {
+  if (props.data[key].type.name === 'group') {
     const item = {};
     item.id = key;
     item.name = props.data[key].name;
@@ -28,10 +29,11 @@ const rows = computed(() =>
     item.shortName = props.data[key]['short_name'];
     item.type = props.data[key].type;
     item.form = props.data[key].form;
-    return item;
-  }),
-);
-// type.name.group - группа, остальное - параметры
-// вывести отдельно таблицу параметров, отдельно групп
+    rows.value.push(item);
+  }
+}
+
+console.log(rows);
 </script>
-<style scoped></style>
+
+<style lang="scss" scoped></style>
