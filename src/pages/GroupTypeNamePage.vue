@@ -11,12 +11,12 @@
 </template>
 
 <script setup>
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import { computed } from 'vue';
+
 const props = defineProps({
   data: Object,
 });
+
 const rows = computed(() => []);
 const dataKeys = Object.keys(props.data);
 for (const key of dataKeys) {
@@ -33,7 +33,7 @@ for (const key of dataKeys) {
   }
 }
 
-console.log(rows);
+console.log(rows.value);
 </script>
 
 <style lang="scss" scoped></style>

@@ -11,13 +11,12 @@
 </template>
 <!--  вывести в таблицу name, is_negative, description, short_name, form, type -->
 <script setup>
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
 import { computed } from 'vue';
 
 const props = defineProps({
   data: Object,
 });
+
 const rows = computed(() =>
   Object.keys(props.data).map((key) => {
     const item = {};

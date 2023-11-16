@@ -5,7 +5,6 @@
 </template>
 
 <script setup>
-import TabMenu from 'primevue/tabmenu';
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
