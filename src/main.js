@@ -9,7 +9,10 @@ import Menubar from 'primevue/menubar';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
+import Button from 'primevue/button';
 import 'primevue/resources/themes/lara-light-teal/theme.css';
+import 'primeicons/primeicons.css'
+
 
 const app = createApp(App);
 app
@@ -22,4 +25,5 @@ app
   .component('Dropdown', Dropdown)
   .component('InputText', InputText)
   .component('Textarea', Textarea)
+  .component('Button', Button)
   .mount('#app');

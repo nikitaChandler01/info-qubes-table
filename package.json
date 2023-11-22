@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
+    "primeicons": "^6.0.1",
     "primevue": "^3.40.1",
+    "vite-plugin-fs": "^1.0.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5"
   },
