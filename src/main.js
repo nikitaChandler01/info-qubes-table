@@ -10,6 +10,7 @@ import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
+import ColorPicker from 'primevue/colorpicker';
 import 'primevue/resources/themes/lara-light-teal/theme.css';
 import 'primeicons/primeicons.css'
 
@@ -26,4 +27,5 @@ app
   .component('InputText', InputText)
   .component('Textarea', Textarea)
   .component('Button', Button)
+  .component('ColorPicker', ColorPicker)
   .mount('#app');
