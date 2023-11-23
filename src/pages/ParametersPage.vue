@@ -89,7 +89,7 @@
     dataKey="id"
     @row-edit-save="onRowEditSave"
   >
-    <Column field="id" header="Parameter/Параметр" style="width: 10%">
+    <Column field="id" header="Группа" style="width: 10%">
       <template #body="{ data, field }">
         {{ data[field] }}
       </template>
@@ -100,18 +100,6 @@
         <InputText v-model="data[field]" />
       </template>
     </Column>
-    <Column field="isNegative" header="isNegative" style="width: 10%">
-      <template #editor="{ data, field }">
-        <Dropdown
-          v-model="data[field]"
-          :options="values.isNegative"
-          optionLabel="name"
-          optionValue="name"
-          placeholder="Выберите значение"
-          class="w-full md:w-14rem"
-        />
-      </template>
-    </Column>
     <Column field="description" header="Description/Описание" style="width: 35%">
       <template #editor="{ data, field }">
         <Textarea v-model="data[field]" />
@@ -120,11 +108,6 @@
     <Column field="shortName" header="Short Name/Сокращение" style="width: 15%">
       <template #editor="{ data, field }">
         <InputText v-model="data[field]" />
-      </template>
-    </Column>
-    <Column field="type" header="type name" style="width: 15%">
-      <template #body="{ data }">
-        {{ data.type }}
       </template>
     </Column>
     <Column field="count" header="Count of params/Количество параметров" style="width: 15%">
