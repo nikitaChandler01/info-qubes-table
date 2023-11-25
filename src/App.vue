@@ -4,11 +4,7 @@
       <MyMenuBar></MyMenuBar>
     </div>
     <div class="content">
-      <RouterView
-        @dataChanged="func"
-        :data="data"
-        :isLoading="isLoading"
-      />
+      <RouterView @dataChanged="func" :data="data" :isLoading="isLoading" />
     </div>
   </div>
 </template>
@@ -18,13 +14,15 @@ import scriptParameters from './mocks/scriptParameters.js';
 import MyMenuBar from './components/myMenuBar.vue';
 import { ref } from 'vue';
 
+
 let data = ref(scriptParameters);
 
 const isLoading = ref(false);
 // setTimeout(() => isLoading.value = false, 3000)
 
+
 const func = (newData) => {
-  data = ref(newData);
+  Object.assign(scriptParameters[newData.screen_name], newData);
 };
 </script>
 

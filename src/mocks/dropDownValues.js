@@ -1,11 +1,19 @@
 export default {
-  isNegative: [{ name: 'Обратное' }, { name: 'Прямое' }],
-  typeName: [
-    { name: 'Оценка' },
-    { name: 'Речевое' },
-    { name: 'Метаданные' },
-    { name: 'Фильтр' },
-    { name: 'Группа' },
+  isNegative: [
+    { name: 'Обратное', value: 'true' },
+    { name: 'Прямое', value: 'false' },
   ],
-  formName: [{ name: 'Простой' }, { name: 'Сложный' }, { name: 'Наставник' }, { name: 'Клиент' }],
+  typeName: [
+    { name: 'Оценка', value: 'grade' },
+    { name: 'Речевое', value: 'keyword' },
+    { name: 'Метаданные', value: 'meta' },
+    { name: 'Фильтр', value: 'filter' },
+    { name: 'Группа', value: 'group' },
+  ],
+  formName: [
+    { name: 'Простой', value: 'simple' },
+    { name: 'Сложный', value: 'compound' },
+    { name: 'Наставник', value: 'coach' },
+    { name: 'Клиент', value: 'client' },
+  ],
 };
