@@ -398,6 +398,7 @@ const showParameters = (data) => {
     fillDataCopyParams(dataCopy);
   }
 };
+
 </script>
 <style>
 .table {
