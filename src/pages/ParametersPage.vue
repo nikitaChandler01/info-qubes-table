@@ -42,7 +42,7 @@
     </Column>
     <Column :field="'short_name'" header="Short Name/Сокращение" style="width: 15%">
       <template #editor="{ data, field }">
-        <InputText v-model="data[field]" />
+        <InputText v-model="data.field" />
       </template>
     </Column>
     <Column :field="'type.name'" header="type name" style="width: 15%">
@@ -91,7 +91,7 @@
     :value="rowsGroup"
     editMode="row"
     dataKey="id"
-    @row-edit-save="onRowEditSave"
+    @row-edit-save="onRowGroupEditSave"
   >
     <Column field="id" header="Группа" style="width: 15%">
       <template #editor="{ data, field }">
@@ -115,7 +115,7 @@
     </Column>
     <Column field="type" header="type name" style="width: 15%">
       <template #body="{ data }">
-        {{ data.type }}
+        {{ translateMapping[data.type.name]() }}
       </template>
     </Column>
     <Column field="count" header="Count of params/Количество параметров" style="width: 15%">
@@ -123,23 +123,37 @@
         <span style="text-align: center">Кол-во параметров: {{ data.count }}</span></template
       >
     </Column>
-    <Column field="parameters" header="Parameters/Параметры" style="width: 15%">
+    <Column header="Parameters/Параметры" style="width: 15%">
       <template #body="{ data }">
-        <VirtualScroller
-          :items="data.parameters"
-          :itemSize="50"
-          class="border-1 surface-border border-round"
-          style="width: 200px; height: 120px"
-        >
-          <template v-slot:item="{ item, options }">
-            <div
-              :class="['flex align-items-center p-2', { 'surface-hover': options.odd }]"
-              style="height: 50px"
-            >
-              {{ item }}
-            </div>
-          </template>
-        </VirtualScroller>
+        <div class="card flex justify-content-center">
+          <VirtualScroller
+            :items="data.parametersNames"
+            :itemSize="50"
+            class="border-1 surface-border border-round"
+            style="width: 200px; height: 200px"
+          >
+            <template v-slot:item="{ item, options }">
+              <div
+                :class="['flex align-items-center p-2', { 'surface-hover': options.odd }]"
+                style="height: 50px"
+              >
+                {{ item }}
+              </div>
+            </template>
+          </VirtualScroller>
+        </div>
+      </template>
+      <template #editor="{ data }">
+        <div class="card flex justify-content-center">
+          <MultiSelect
+            v-model="data.selectedParameters"
+            :options="parameters"
+            filter
+            optionLabel="name"
+            placeholder="Выберите параметр"
+            :maxSelectedLabels="2"
+          />
+        </div>
       </template>
     </Column>
     <Column field="color" header="Color/Цвет" style="width: 15%">
@@ -165,6 +179,11 @@
         </div>
       </template>
     </Column>
+    <Column header="Действия">
+      <template #body="{ data }">
+        <Button label="Отобразить параметры" text severity="info" @click="showParameters(data)" />
+      </template>
+    </Column>
     <Column
       :rowEditor="true"
       style="width: 10%; min-width: 8rem"
@@ -174,10 +193,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import translateMapping from '../mocks/translateMapping.js';
 import values from '../mocks/dropDownValues.js';
-import { uniqueId, find } from 'lodash';
+import { find } from 'lodash';
+
+const state = {
+  showedAllParams: ref(true),
+};
 
 const props = defineProps({
   data: {
@@ -206,54 +229,132 @@ const arrayColors = [
 const editingRows = ref([]);
 const dataCopy = ref(props.data);
 const dataKeys = computed(() => Object.keys(dataCopy.value));
-const dataCopyParams = ref(
-  Object.values(dataCopy.value)
-    .map((value) => {
-      if (value.type.name === 'group') {
-        return;
-      }
-      value.id = uniqueId();
-      return value;
-    })
-    .filter((item) => item !== undefined),
+const dataCopyParams = ref([]);
+
+const fillDataCopyParams = (dataCopy) => {
+  dataCopyParams.value = [];
+  for (const [key, value] of Object.entries(dataCopy.value)) {
+    if (value.type.name !== 'group') {
+      value.id = key;
+      dataCopyParams.value.push(value);
+    }
+  }
+};
+fillDataCopyParams(dataCopy);
+
+watch(
+  () => dataCopy,
+  (_, newDataCopy) => {
+    fillDataCopyParams(newDataCopy);
+  },
+  {
+    deep: true,
+  },
 );
 
-const dataCopyGroups = ref(
-  Object.values(dataCopy.value)
-    .map((value, index) => {
-      if (value.type.name === 'group') {
-        value.paramName = dataKeys.value[index];
-        return value;
-      }
-      return;
-    })
-    .filter((item) => item !== undefined),
+const dataCopyGroups = ref([]);
+
+const fillDataCopyGroups = (dataCopy) => {
+  dataCopyGroups.value = [];
+  for (const [key, value] of Object.entries(dataCopy.value)) {
+    if (value.type.name === 'group') {
+      value.id = key;
+      dataCopyGroups.value.push(value);
+    }
+  }
+};
+fillDataCopyGroups(dataCopy);
+
+watch(
+  () => dataCopy,
+  (_, newDataCopy) => {
+    fillDataCopyGroups(newDataCopy);
+  },
+  {
+    deep: true,
+  },
 );
 
 const rowsGroup = ref([]);
-
 for (const group of dataCopyGroups.value) {
   const item = {};
-  item.id = group.paramName;
+  item.id = group.id;
   item.name = group.name;
   item.description = group.description;
   item.shortName = group['short_name'];
-  item.type = translateMapping[group.type.name]();
-  item.parameters = Array.from(group.parameters);
-  item.color = find(arrayColors, (item) => item[group.paramName])[group.paramName];
+  item.type = group.type;
+  item.parameters = group.parameters;
+  item.parametersNames = group.parameters.map((param) => dataCopy.value[param].name);
+  item.selectedParameters = ref(
+    group.parameters.map((param) => ({
+      name: dataCopy.value[param].name,
+      value: dataCopy.value[param].id,
+    })),
+  );
+  item.color = find(arrayColors, (item) => item[group.id])[group.id];
   item.count = item.parameters.length;
   rowsGroup.value.push(item);
 }
-
-const emit = defineEmits(['dataChanged', 'rowDeleted']);
-
-
+watch(
+  () => dataCopyGroups,
+  (_, newDataCopyGroups) => {
+    rowsGroup.value = [];
+    for (const group of newDataCopyGroups.value) {
+      const item = {};
+      item.id = group.id;
+      item.name = group.name;
+      item.description = group.description;
+      item.shortName = group['short_name'];
+      item.type = group.type;
+      item.parameters = group.parameters;
+      item.parametersNames = group.parameters.map((param) => dataCopy.value[param].name);
+      item.selectedParameters = ref(
+        group.parameters.map((param) => ({
+          name: dataCopy.value[param].name,
+          value: dataCopy.value[param].id,
+        })),
+      );
+      item.color = find(arrayColors, (item) => item[group.id])[group.id];
+      item.count = item.parameters.length;
+      rowsGroup.value.push(item);
+    }
+  },
+  {
+    deep: true,
+  },
+);
+const parameters = ref(
+  dataCopyParams.value.map((param) => ({
+    name: param.name,
+    value: param.id,
+  })),
+);
+const emit = defineEmits(['paramsChanged', 'groupsChanged', 'rowDeleted']);
 
 const onRowEditSave = (event) => {
-  const editItem = ref({});
-  editItem.value = event.newData;
-  console.log(editItem.value);
-  emit('dataChanged', editItem.value);
+  let editItem = {};
+  const index = event.newData.id;
+  editItem = event.newData;
+  delete editItem.id;
+  emit('paramsChanged', editItem, index);
+  editItem = {};
+};
+
+const onRowGroupEditSave = (event) => {
+  let editItem = {};
+  const index = event.newData.id;
+  editItem = event.newData;
+  editItem.parameters = [];
+  for (const selectedParameter of editItem.selectedParameters) {
+    editItem.parameters.push(selectedParameter.value);
+  }
+  delete editItem.selectedParameters;
+  delete editItem.id;
+  delete editItem.count;
+  delete editItem.color;
+  delete editItem.parametersNames;
+  emit('groupsChanged', editItem, index);
+  editItem = {};
 };
 
 const removeRow = ({ data }) => {
@@ -278,6 +379,18 @@ const paintBackground = (data) => {
     return `background: ${currentColoredParams.value.color}`;
   } else {
     return '';
+  }
+};
+const showParameters = (data) => {
+  state.showedAllParams.value = !state.showedAllParams.value;
+  if (!state.showedAllParams.value) {
+    const buffDataCopy = ref({});
+    for (const param of data.parameters) {
+      buffDataCopy.value[param] = dataCopy.value[param];
+    }
+    fillDataCopyParams(buffDataCopy);
+  } else {
+    fillDataCopyParams(dataCopy);
   }
 };
 </script>
