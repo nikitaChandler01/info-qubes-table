@@ -19,15 +19,19 @@ import { ref } from 'vue';
 
 let data = ref(scriptParameters);
 
-const isLoading = ref(false);
-// setTimeout(() => isLoading.value = false, 3000)
+const isLoading = ref(true);
+setTimeout(() => isLoading.value = false, 0)
 const toast = useToast();
 const changeParams = (newData, name) => {
+  isLoading.value = true;
   data.value[name] = newData;
+  isLoading.value = false;
   toast.add({ severity: 'success', summary: 'Server response', detail: 'Data Changed', life: 3000 });
 };
 const changeGroups = (newData, name) => {
+  isLoading.value = true;
   data.value[name] = newData;
+  isLoading.value = false;
   toast.add({ severity: 'success', summary: 'Server response', detail: 'Data Changed', life: 3000 });
 };
 </script>

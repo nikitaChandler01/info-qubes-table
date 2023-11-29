@@ -15,9 +15,9 @@ import ColorPicker from 'primevue/colorpicker';
 import MultiSelect from 'primevue/multiselect';
 import VirtualScroller from 'primevue/virtualscroller';
 import Toast from 'primevue/toast';
-import 'primevue/resources/themes/lara-light-teal/theme.css';
-import 'primeicons/primeicons.css'
+import 'primevue/resources/themes/saga-blue/theme.css'
 
+import 'primeicons/primeicons.css'
 
 const app = createApp(App);
 app

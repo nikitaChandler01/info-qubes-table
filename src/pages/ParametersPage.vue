@@ -9,6 +9,7 @@
     dataKey="id"
     @row-edit-save="onRowEditSave"
     :rowStyle="paintBackground"
+    :loading="isLoading"
   >
     <Column :field="'screen_name'" header="Parameter/Параметр" style="width: 10%">
       <template #body="slotProps">
@@ -92,6 +93,7 @@
     editMode="row"
     dataKey="id"
     @row-edit-save="onRowGroupEditSave"
+    :loading="isLoading"
   >
     <Column field="id" header="Группа" style="width: 15%">
       <template #editor="{ data, field }">
@@ -180,8 +182,11 @@
       </template>
     </Column>
     <Column header="Действия">
-      <template #body="{ data }">
-        <Button label="Отобразить параметры" text severity="info" @click="showParameters(data)" />
+      <template v-if="state.showedAllParams.value" #body="{ data }">
+        <Button label="Отобразить параметры группы" text severity="info" @click="showParameters(data)" />
+      </template>
+      <template v-if="!state.showedAllParams.value" #body="{ data }">
+        <Button label="Отобразить все параметры" text severity="success" @click="showParameters(data)" />
       </template>
     </Column>
     <Column
@@ -198,10 +203,6 @@ import translateMapping from '../mocks/translateMapping.js';
 import values from '../mocks/dropDownValues.js';
 import { find } from 'lodash';
 
-const state = {
-  showedAllParams: ref(true),
-};
-
 const props = defineProps({
   data: {
     type: Object,
@@ -212,6 +213,10 @@ const props = defineProps({
     required: true,
   },
 });
+
+const state = {
+  showedAllParams: ref(true),
+};
 
 const arrayColors = [
   { '1hgy3': '#a2e67e' },
