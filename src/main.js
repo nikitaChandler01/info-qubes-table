@@ -15,6 +15,7 @@ import ColorPicker from 'primevue/colorpicker';
 import MultiSelect from 'primevue/multiselect';
 import VirtualScroller from 'primevue/virtualscroller';
 import Toast from 'primevue/toast';
+import Dialog from 'primevue/dialog';
 import 'primevue/resources/themes/saga-blue/theme.css'
 
 import 'primeicons/primeicons.css'
@@ -36,4 +37,5 @@ app
   .component('MultiSelect', MultiSelect)
   .component('VirtualScroller', VirtualScroller)
   .component('Toast', Toast)
+  .component('Dialog', Dialog)
   .mount('#app');

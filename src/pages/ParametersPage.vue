@@ -1,207 +1,226 @@
 <template>
-  <DataTable
-    scrollable
-    scrollHeight="46vh"
-    class="table"
-    v-model:editingRows="editingRows"
-    :value="dataCopyParams"
-    editMode="row"
-    dataKey="id"
-    @row-edit-save="onRowEditSave"
-    :rowStyle="paintBackground"
-    :loading="isLoading"
-  >
-    <Column :field="'screen_name'" header="Parameter/Параметр" style="width: 10%">
-      <template #body="slotProps">
-        {{ slotProps.data.screen_name }}
+  <div class="container">
+    <Button label="Создать" @click="state.isVisibleCreatingForm = true" />
+    <Dialog v-model:visible="state.isVisibleCreatingForm" modal header="Header" style="width: 100%">
+      <template #container>
+        <MyCreateForm  @parameterAdded="addParameter" @canceledCreating="closeForm" :groups="[]" :params="[]" />
       </template>
-    </Column>
-    <Column :field="'name'" header="Name/Имя" style="width: 15%">
-      <template #editor="{ data, field }">
-        <InputText v-model="data[field]" />
-      </template>
-    </Column>
-    <Column :field="'is_negative'" header="isNegative" style="width: 10%">
-      <template #body="{ data, field }">
-        {{ translateMapping[data[field]]() }}
-      </template>
-      <template #editor="{ data, field }">
-        <Dropdown
-          v-model="data[field]"
-          :options="values.isNegative"
-          optionLabel="name"
-          optionValue="value"
-          placeholder="Выберите значение"
-          class="w-full md:w-14rem"
-        />
-      </template>
-    </Column>
-    <Column :field="'description'" header="Description/Описание" style="width: 35%">
-      <template #editor="{ data, field }">
-        <Textarea v-model="data[field]" />
-      </template>
-    </Column>
-    <Column :field="'short_name'" header="Short Name/Сокращение" style="width: 15%">
-      <template #editor="{ data, field }">
-        <InputText v-model="data.field" />
-      </template>
-    </Column>
-    <Column :field="'type.name'" header="type name" style="width: 15%">
-      <template #body="{ data }">
-        {{ translateMapping[data.type.name]() }}
-      </template>
-      <template #editor="{ data, field }">
-        <Dropdown
-          v-model="data.type.name"
-          :options="values.typeName"
-          optionLabel="name"
-          optionValue="value"
-          placeholder="Выберите значение"
-          class="w-full md:w-14rem"
-        />
-      </template>
-    </Column>
-    <Column :field="'form.name'" header="form" style="width: 10%">
-      <template #body="{ data }">
-        {{ translateMapping[data.form.name]() }}
-      </template>
-      <template #editor="{ data, field }">
-        <Dropdown
-          v-model="data.form.name"
-          :options="values.formName"
-          optionLabel="name"
-          optionValue="value"
-          placeholder="Выберите значение"
-          class="w-full md:w-14rem"
-        />
-      </template>
-    </Column>
-    <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center" />
-    <Column style="background-color: #f9fafb">
-      <template #body="slotProps">
-        <Button label="Удалить" severity="danger" @click="removeRow(slotProps)" />
-      </template>
-    </Column>
-  </DataTable>
-  <DataTable
-    showGridlines
-    scrollable
-    scrollHeight="46vh"
-    class="table"
-    v-model:editingRows="editingRows"
-    :value="rowsGroup"
-    editMode="row"
-    dataKey="id"
-    @row-edit-save="onRowGroupEditSave"
-    :loading="isLoading"
-  >
-    <Column field="id" header="Группа" style="width: 15%">
-      <template #editor="{ data, field }">
-        <InputText v-model="data[field]" />
-      </template>
-    </Column>
-    <Column field="name" header="Name/Имя" style="width: 15%">
-      <template #editor="{ data, field }">
-        <InputText v-model="data[field]" />
-      </template>
-    </Column>
-    <Column field="description" header="Description/Описание" style="width: 35%">
-      <template #editor="{ data, field }">
-        <Textarea v-model="data[field]" />
-      </template>
-    </Column>
-    <Column field="shortName" header="Short Name/Сокращение" style="width: 15%">
-      <template #editor="{ data, field }">
-        <InputText v-model="data[field]" />
-      </template>
-    </Column>
-    <Column field="type" header="type name" style="width: 15%">
-      <template #body="{ data }">
-        {{ translateMapping[data.type.name]() }}
-      </template>
-    </Column>
-    <Column field="count" header="Count of params/Количество параметров" style="width: 15%">
-      <template #body="{ data }">
-        <span style="text-align: center">Кол-во параметров: {{ data.count }}</span></template
-      >
-    </Column>
-    <Column header="Parameters/Параметры" style="width: 15%">
-      <template #body="{ data }">
-        <div class="card flex justify-content-center">
-          <VirtualScroller
-            :items="data.parametersNames"
-            :itemSize="50"
-            class="border-1 surface-border border-round"
-            style="width: 200px; height: 200px"
-          >
-            <template v-slot:item="{ item, options }">
-              <div
-                :class="['flex align-items-center p-2', { 'surface-hover': options.odd }]"
-                style="height: 50px"
-              >
-                {{ item }}
-              </div>
-            </template>
-          </VirtualScroller>
-        </div>
-      </template>
-      <template #editor="{ data }">
-        <div class="card flex justify-content-center">
-          <MultiSelect
-            v-model="data.selectedParameters"
-            :options="parameters"
-            filter
+    </Dialog>
+    <DataTable
+      scrollable
+      scrollHeight="46vh"
+      class="table"
+      v-model:editingRows="editingRows"
+      :value="dataCopyParams"
+      editMode="row"
+      dataKey="id"
+      @row-edit-save="onRowEditSave"
+      :rowStyle="paintBackground"
+      :loading="isLoading"
+    >
+      <Column :field="'screen_name'" header="Parameter/Параметр" style="width: 10%">
+        <template #body="slotProps">
+          {{ slotProps.data.screen_name }}
+        </template>
+      </Column>
+      <Column :field="'name'" header="Name/Имя" style="width: 15%">
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
+      </Column>
+      <Column :field="'is_negative'" header="isNegative" style="width: 10%">
+        <template #body="{ data, field }">
+          {{ translateMapping[data[field]]() }}
+        </template>
+        <template #editor="{ data, field }">
+          <Dropdown
+            v-model="data[field]"
+            :options="values.isNegative"
             optionLabel="name"
-            placeholder="Выберите параметр"
-            :maxSelectedLabels="2"
+            optionValue="value"
+            placeholder="Выберите значение"
+            class="w-full md:w-14rem"
           />
-        </div>
-      </template>
-    </Column>
-    <Column field="color" header="Color/Цвет" style="width: 15%">
-      <template #body="{ data }">
-        <div class="card">
-          <div class="color-box" :style="`background: ${data.color}`" />
+        </template>
+      </Column>
+      <Column :field="'description'" header="Description/Описание" style="width: 35%">
+        <template #editor="{ data, field }">
+          <Textarea v-model="data[field]" />
+        </template>
+      </Column>
+      <Column :field="'short_name'" header="Short Name/Сокращение" style="width: 15%">
+        <template #editor="{ data, field }">
+          <InputText v-model="data.field" />
+        </template>
+      </Column>
+      <Column :field="'type.name'" header="type name" style="width: 15%">
+        <template #body="{ data }">
+          {{ translateMapping[data.type.name]() }}
+        </template>
+        <template #editor="{ data, field }">
+          <Dropdown
+            v-model="data.type.name"
+            :options="values.typeName"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="Выберите значение"
+            class="w-full md:w-14rem"
+          />
+        </template>
+      </Column>
+      <Column :field="'form.name'" header="form" style="width: 10%">
+        <template #body="{ data }">
+          {{ translateMapping[data.form.name]() }}
+        </template>
+        <template #editor="{ data, field }">
+          <Dropdown
+            v-model="data.form.name"
+            :options="values.formName"
+            optionLabel="name"
+            optionValue="value"
+            placeholder="Выберите значение"
+            class="w-full md:w-14rem"
+          />
+        </template>
+      </Column>
+      <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center" />
+      <Column style="background-color: #f9fafb">
+        <template #body="slotProps">
+          <Button label="Удалить" severity="danger" @click="removeRow(slotProps)" />
+        </template>
+      </Column>
+    </DataTable>
+    <DataTable
+      showGridlines
+      scrollable
+      scrollHeight="46vh"
+      class="table"
+      v-model:editingRows="editingRows"
+      :value="rowsGroup"
+      editMode="row"
+      dataKey="id"
+      @row-edit-save="onRowGroupEditSave"
+      :loading="isLoading"
+    >
+      <Column field="id" header="Группа" style="width: 15%">
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
+      </Column>
+      <Column field="name" header="Name/Имя" style="width: 15%">
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
+      </Column>
+      <Column field="description" header="Description/Описание" style="width: 35%">
+        <template #editor="{ data, field }">
+          <Textarea v-model="data[field]" />
+        </template>
+      </Column>
+      <Column field="shortName" header="Short Name/Сокращение" style="width: 15%">
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" />
+        </template>
+      </Column>
+      <Column field="type" header="type name" style="width: 15%">
+        <template #body="{ data }">
+          {{ translateMapping[data.type.name]() }}
+        </template>
+      </Column>
+      <Column field="count" header="Count of params/Количество параметров" style="width: 15%">
+        <template #body="{ data }">
+          <span style="text-align: center">Кол-во параметров: {{ data.count }}</span></template
+        >
+      </Column>
+      <Column header="Parameters/Параметры" style="width: 15%">
+        <template #body="{ data }">
+          <div class="card flex justify-content-center">
+            <VirtualScroller
+              :items="data.parametersNames"
+              :itemSize="50"
+              class="border-1 surface-border border-round"
+              style="width: 200px; height: 200px"
+            >
+              <template v-slot:item="{ item, options }">
+                <div
+                  :class="['flex align-items-center p-2', { 'surface-hover': options.odd }]"
+                  style="height: 50px"
+                >
+                  {{ item }}
+                </div>
+              </template>
+            </VirtualScroller>
+          </div>
+        </template>
+        <template #editor="{ data }">
+          <div class="card flex justify-content-center">
+            <MultiSelect
+              v-model="data.selectedParameters"
+              :options="parameters"
+              filter
+              optionLabel="name"
+              placeholder="Выберите параметр"
+              :maxSelectedLabels="2"
+            />
+          </div>
+        </template>
+      </Column>
+      <Column field="color" header="Color/Цвет" style="width: 15%">
+        <template #body="{ data }">
+          <div class="card">
+            <div class="color-box" :style="`background: ${data.color}`" />
+            <Button
+              @click="changeColor(data)"
+              type="submit"
+              icon="pi pi-check"
+              rounded
+              text
+              aria-label="Filter"
+            />
+            <Button
+              @click="resetCurrentColor(data)"
+              icon="pi pi-times"
+              text
+              severity="danger"
+              rounded
+              aria-label="Filter"
+            />
+          </div>
+        </template>
+      </Column>
+      <Column header="Действия">
+        <template v-if="state.showedAllParams" #body="{ data }">
           <Button
-            @click="changeColor(data)"
-            type="submit"
-            icon="pi pi-check"
-            rounded
+            label="Отобразить параметры группы"
             text
-            aria-label="Filter"
+            severity="info"
+            @click="showParameters(data)"
           />
+        </template>
+        <template v-if="!state.showedAllParams" #body="{ data }">
           <Button
-            @click="resetCurrentColor(data)"
-            icon="pi pi-times"
+            label="Отобразить все параметры"
             text
-            severity="danger"
-            rounded
-            aria-label="Filter"
+            severity="success"
+            @click="showParameters(data)"
           />
-        </div>
-      </template>
-    </Column>
-    <Column header="Действия">
-      <template v-if="state.showedAllParams.value" #body="{ data }">
-        <Button label="Отобразить параметры группы" text severity="info" @click="showParameters(data)" />
-      </template>
-      <template v-if="!state.showedAllParams.value" #body="{ data }">
-        <Button label="Отобразить все параметры" text severity="success" @click="showParameters(data)" />
-      </template>
-    </Column>
-    <Column
-      :rowEditor="true"
-      style="width: 10%; min-width: 8rem"
-      bodyStyle="text-align:center"
-    ></Column>
-  </DataTable>
+        </template>
+      </Column>
+      <Column
+        :rowEditor="true"
+        style="width: 10%; min-width: 8rem"
+        bodyStyle="text-align:center"
+      ></Column>
+    </DataTable>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, reactive } from 'vue';
 import translateMapping from '../mocks/translateMapping.js';
 import values from '../mocks/dropDownValues.js';
 import { find } from 'lodash';
+import MyCreateForm from '../components/MyCreateForm.vue';
 
 const props = defineProps({
   data: {
@@ -214,9 +233,10 @@ const props = defineProps({
   },
 });
 
-const state = {
-  showedAllParams: ref(true),
-};
+const state = reactive({
+  showedAllParams: true,
+  isVisibleCreatingForm: false,
+});
 
 const arrayColors = [
   { '1hgy3': '#a2e67e' },
@@ -334,7 +354,7 @@ const parameters = ref(
     value: param.id,
   })),
 );
-const emit = defineEmits(['paramsChanged', 'groupsChanged', 'rowDeleted']);
+const emit = defineEmits(['paramsChanged', 'groupsChanged', 'rowDeleted', 'parameterAdded']);
 
 const onRowEditSave = (event) => {
   let editItem = {};
@@ -342,7 +362,6 @@ const onRowEditSave = (event) => {
   editItem = event.newData;
   delete editItem.id;
   emit('paramsChanged', editItem, index);
-  editItem = {};
 };
 
 const onRowGroupEditSave = (event) => {
@@ -359,36 +378,35 @@ const onRowGroupEditSave = (event) => {
   delete editItem.color;
   delete editItem.parametersNames;
   emit('groupsChanged', editItem, index);
-  editItem = {};
 };
 
 const removeRow = ({ data }) => {
   emit('rowDeleted', data);
 };
 
-const currentColoredParams = ref({
+const currentColoredParams = reactive({
   parameters: [],
   color: '',
 });
 
 const changeColor = (data) => {
-  currentColoredParams.value.parameters = data.parameters;
-  currentColoredParams.value.color = data.color;
+  currentColoredParams.parameters = data.parameters;
+  currentColoredParams.color = data.color;
 };
 const resetCurrentColor = (data) => {
-  currentColoredParams.value.parameters = [];
-  currentColoredParams.value.color = '';
+  currentColoredParams.parameters = [];
+  currentColoredParams.color = '';
 };
 const paintBackground = (data) => {
-  if (currentColoredParams.value.parameters.includes(data.screen_name)) {
-    return `background: ${currentColoredParams.value.color}`;
+  if (currentColoredParams.parameters.includes(data.screen_name)) {
+    return `background: ${currentColoredParams.color}`;
   } else {
     return '';
   }
 };
 const showParameters = (data) => {
-  state.showedAllParams.value = !state.showedAllParams.value;
-  if (!state.showedAllParams.value) {
+  state.showedAllParams = !state.showedAllParams;
+  if (!state.showedAllParams) {
     const buffDataCopy = ref({});
     for (const param of data.parameters) {
       buffDataCopy.value[param] = dataCopy.value[param];
@@ -398,6 +416,15 @@ const showParameters = (data) => {
     fillDataCopyParams(dataCopy);
   }
 };
+const closeForm = () => {
+  state.isVisibleCreatingForm = false;
+};
+
+const addParameter = (newParameter) => {
+  state.isVisibleCreatingForm = false;
+  emit('parameterAdded', newParameter)
+  
+}
 </script>
 <style>
 .table {
