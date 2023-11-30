@@ -99,7 +99,7 @@
 <script setup>
 import { reactive, ref } from 'vue';
 import { randomizeParamName } from '@services/services.js';
-import translateMapping from '@mocks/translateMapping.js';
+import translateMapping from '@mocks/translateMapping';
 import values from '../mocks/dropDownValues.js';
 
 const props = defineProps({
