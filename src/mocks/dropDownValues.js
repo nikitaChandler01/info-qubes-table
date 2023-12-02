@@ -16,4 +16,8 @@ export default {
     { name: 'Наставник', value: 'coach' },
     { name: 'Клиент', value: 'client' },
   ],
+  aggregation: [
+    { name: 'Средний', value: 'avg' },
+    { name: 'Суммарный', value: 'sum' },
+  ],
 };

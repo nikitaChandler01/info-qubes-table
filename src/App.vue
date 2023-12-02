@@ -1,4 +1,5 @@
 <template>
+  <!-- <Message class="error-message" severity="error">Error Message</Message> -->
   <div class="container">
     <div class="menuBar">
       <MyMenuBar></MyMenuBar>
@@ -17,65 +18,118 @@
 </template>
 
 <script setup>
-import scriptParameters from './mocks/scriptParameters.js';
-import MyMenuBar from './components/MyMenuBar.vue';
+import scriptParameters from '@/mocks/scriptParameters.js';
+import MyMenuBar from '@/components/MyMenuBar.vue';
 import { useToast } from 'primevue/usetoast';
-import { getDataFromServer } from '@services/index.js';
-
+import { getDataFromServer, putNewDataToServer } from '@services/index.js';
+import { onBeforeMount } from 'vue';
 import { ref } from 'vue';
 
-let data = ref(scriptParameters);
+const token = import.meta.env.VITE_SECRET_TOKEN;
+const url = import.meta.env.VITE_URL
 
-const isLoading = ref(true);
-setTimeout(() => (isLoading.value = false), 0);
+let data = ref({});
+
+onBeforeMount(async () => {
+  getDataFromServer(url, token)
+    .then((result) => {
+      data.value = result.response.data.scriptParameters;
+    })
+    .catch((error) => {
+      console.log(error);
+      component 
+    });
+    isLoading.value = false;
+});
+
+const isLoading = ref(false);
 const toast = useToast();
-const changeParams = (newData, name) => {
+const changeParams = async (newData, name) => {
   isLoading.value = true;
   data.value[name] = newData;
+  await putNewDataToServer(url, data.value, token)
+    .then((result) => {
+      toast.add({
+        severity: 'success',
+        summary: 'Запрос отправлен',
+        detail: 'Данные изменены',
+        life: 5000,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+    .then(() =>
+      getDataFromServer(url, token)
+        .then((result) => {
+          toast.add({
+            severity: 'success',
+            summary: 'Ответ получен',
+            detail: 'Данные загружены',
+            life: 5000,
+          });
+          data.value = result.response.data.scriptParameters;
+          console.log(data.value);
+        })
+        .catch((error) => {
+          console.log(error);
+        }),
+    );
   isLoading.value = false;
-  toast.add({
-    severity: 'success',
-    summary: 'Server response',
-    detail: 'Data Changed',
-    life: 3000,
-  });
 };
 
-const changeGroups = (newData, name) => {
+const changeGroups = async (newData, name) => {
+  console.log(newData)
   isLoading.value = true;
   data.value[name] = newData;
+  await putNewDataToServer(url, data.value, token)
+    .then(() => {
+      toast.add({
+        severity: 'success',
+        summary: 'Запрос отправлен',
+        detail: 'Данные изменены',
+        life: 5000,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+    .then(() =>
+      getDataFromServer(url, token)
+        .then((result) => {
+          toast.add({
+            severity: 'success',
+            summary: 'Ответ получен',
+            detail: 'Данные загружены',
+            life: 5000,
+          });
+          data.value = result.response.data.scriptParameters;
+        })
+        .catch((error) => {
+          console.log(error);
+        }),
+    );
   isLoading.value = false;
-  toast.add({
-    severity: 'success',
-    summary: 'Server response',
-    detail: 'Data Changed',
-    life: 3000,
-  });
 };
 
-const addParameter = (newParameter) => {
+const addParameter = async (newParameter) => {
+  isLoading.value = true;
   data.value[newParameter.screen_name] = newParameter;
-}
-const url = new URL('http://prod3.infoqubes.ru:58005/S7CC/tmpParameters');
-
-getDataFromServer(url, 'mCCMjAS8MzzSbdV3x7sATeU2NnhUDPSksE2')
-  .then((result) => {
-    console.log(result);
-  })
-  .catch((error) => {
-    console.log(error);
-  });
-
-// putNewDataToServer(
-//     url,
-//     data,
-// )
-//     .then((result) => {
-//       console.log(result)
-//     })
-//     .catch((error) => {
-//       console.log(error);
-//     });
+  await putNewDataToServer(url, data.value, token)
+    .catch((error) => {
+      console.log(error);
+    })
+    .then(() =>
+      getDataFromServer(url, token)
+        .then((result) => {
+          data.value = result.response.data.scriptParameters;
+        })
+        .catch((error) => {
+          console.log(error);
+        }),
+    );
+  isLoading.value = false;
+};
 </script>
 
 <style>
@@ -85,6 +139,11 @@ body {
 }
 .container {
   overflow: hidden;
+}
+.error-message {
+  position: absolute;
+  right: 0;
+  width: 300px;
 }
 .content {
   display: flex;

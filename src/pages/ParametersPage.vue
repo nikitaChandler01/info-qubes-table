@@ -3,7 +3,7 @@
     <Button label="Создать" @click="state.isVisibleCreatingForm = true" />
     <Dialog v-model:visible="state.isVisibleCreatingForm" modal header="Header" style="width: 100%">
       <template #container>
-        <MyCreateForm  @parameterAdded="addParameter" @canceledCreating="closeForm" :groups="[]" :params="[]" />
+        <MyCreateForm  @parameterAdded="addParameter" @canceledCreating="closeForm" :parameters="allIdParameters" />
       </template>
     </Dialog>
     <DataTable
@@ -50,7 +50,7 @@
       </Column>
       <Column :field="'short_name'" header="Short Name/Сокращение" style="width: 15%">
         <template #editor="{ data, field }">
-          <InputText v-model="data.field" />
+          <InputText v-model="data[field]" />
         </template>
       </Column>
       <Column :field="'type.name'" header="type name" style="width: 15%">
@@ -68,7 +68,7 @@
           />
         </template>
       </Column>
-      <Column :field="'form.name'" header="form" style="width: 10%">
+      <Column :field="'form.name'" header="form name" style="width: 10%">
         <template #body="{ data }">
           {{ translateMapping[data.form.name]() }}
         </template>
@@ -216,11 +216,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, reactive } from 'vue';
-import translateMapping from '../mocks/translateMapping.js';
-import values from '../mocks/dropDownValues.js';
+import { ref, computed, watch, reactive, onMounted } from 'vue';
+import translateMapping from '@/mocks/translateMapping.js';
+import values from '@/mocks/dropDownValues.js';
 import { find } from 'lodash';
-import MyCreateForm from '../components/MyCreateForm.vue';
+import MyCreateForm from '@/components/MyCreateForm.vue';
 
 const props = defineProps({
   data: {
@@ -232,7 +232,6 @@ const props = defineProps({
     required: true,
   },
 });
-
 const state = reactive({
   showedAllParams: true,
   isVisibleCreatingForm: false,
@@ -252,10 +251,15 @@ const arrayColors = [
   { etecet: '#c2efab' },
 ];
 const editingRows = ref([]);
-const dataCopy = ref(props.data);
+const dataCopy = ref({});
+onMounted(() => {
+  console.log(props.data)
+  dataCopy.value = props.data
+  console.log(dataCopy.value)
+})
+const allIdParameters = Object.keys(dataCopy.value);
 const dataKeys = computed(() => Object.keys(dataCopy.value));
 const dataCopyParams = ref([]);
-
 const fillDataCopyParams = (dataCopy) => {
   dataCopyParams.value = [];
   for (const [key, value] of Object.entries(dataCopy.value)) {
@@ -354,6 +358,7 @@ const parameters = ref(
     value: param.id,
   })),
 );
+
 const emit = defineEmits(['paramsChanged', 'groupsChanged', 'rowDeleted', 'parameterAdded']);
 
 const onRowEditSave = (event) => {
@@ -361,6 +366,7 @@ const onRowEditSave = (event) => {
   const index = event.newData.id;
   editItem = event.newData;
   delete editItem.id;
+  console.log(editItem)
   emit('paramsChanged', editItem, index);
 };
 
@@ -422,6 +428,7 @@ const closeForm = () => {
 
 const addParameter = (newParameter) => {
   state.isVisibleCreatingForm = false;
+  console.log(newParameter)
   emit('parameterAdded', newParameter)
   
 }

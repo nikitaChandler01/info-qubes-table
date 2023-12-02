@@ -21,12 +21,12 @@ export const getDataFromServer = async function (urlToRequestDataFromServer, cur
 };
 
 
-export const putNewDataToServer = async function (urlToRequestDataFromServer, data) {
+export const putNewDataToServer = async function (urlToRequestDataFromServer, data, currentToken) {
   try {
     const json = await axios.put(urlToRequestDataFromServer, data, {
-      // headers: {
-      //   Authorization: currentToken.replace(/"/g, ''),
-      // },
+      headers: {
+        Authorization: currentToken.replace(/"/g, ''),
+      },
       validateStatus: function (status) {
         return status < 500; // Resolve only if the status code is less than 500
       },
