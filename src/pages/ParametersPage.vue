@@ -3,7 +3,11 @@
     <Button label="Создать" @click="state.isVisibleCreatingForm = true" />
     <Dialog v-model:visible="state.isVisibleCreatingForm" modal header="Header" style="width: 100%">
       <template #container>
-        <MyCreateForm  @parameterAdded="addParameter" @canceledCreating="closeForm" :parameters="allIdParameters" />
+        <MyCreateForm
+          @parameterAdded="addParameter"
+          @canceledCreating="closeForm"
+          :parameters="allIdParameters"
+        />
       </template>
     </Dialog>
     <DataTable
@@ -15,12 +19,24 @@
       editMode="row"
       dataKey="id"
       @row-edit-save="onRowEditSave"
-      :rowStyle="paintBackground"
       :loading="isLoading"
     >
       <Column :field="'screen_name'" header="Parameter/Параметр" style="width: 10%">
         <template #body="slotProps">
           {{ slotProps.data.screen_name }}
+          <div style="display: flex; justify-content: space-around; flex-wrap: wrap">
+            <div class="color-container" v-for="item in Object.values(state.coloredGroups)">
+              <div
+                v-if="item.parameters.includes(slotProps.data.screen_name)"
+                :style="{
+                  background: item.color,
+                  width: 20 + 'px',
+                  height: 20 + 'px',
+                  borderRadius: 50 + '%',
+                }"
+              />
+            </div>
+          </div>
         </template>
       </Column>
       <Column :field="'name'" header="Name/Имя" style="width: 15%">
@@ -166,11 +182,11 @@
         </template>
       </Column>
       <Column field="color" header="Color/Цвет" style="width: 15%">
-        <template #body="{ data }">
+        <template #body="{ data, field }">
           <div class="card">
             <div class="color-box" :style="`background: ${data.color}`" />
             <Button
-              @click="changeColor(data)"
+              @click="addColor(data, field)"
               type="submit"
               icon="pi pi-check"
               rounded
@@ -178,7 +194,7 @@
               aria-label="Filter"
             />
             <Button
-              @click="resetCurrentColor(data)"
+              @click="deleteColor(data, field)"
               icon="pi pi-times"
               text
               severity="danger"
@@ -235,6 +251,7 @@ const props = defineProps({
 const state = reactive({
   showedAllParams: true,
   isVisibleCreatingForm: false,
+  coloredGroups: {},
 });
 
 const arrayColors = [
@@ -251,12 +268,7 @@ const arrayColors = [
   { etecet: '#c2efab' },
 ];
 const editingRows = ref([]);
-const dataCopy = ref({});
-onMounted(() => {
-  console.log(props.data)
-  dataCopy.value = props.data
-  console.log(dataCopy.value)
-})
+const dataCopy = ref(props.data);
 const allIdParameters = Object.keys(dataCopy.value);
 const dataKeys = computed(() => Object.keys(dataCopy.value));
 const dataCopyParams = ref([]);
@@ -366,7 +378,7 @@ const onRowEditSave = (event) => {
   const index = event.newData.id;
   editItem = event.newData;
   delete editItem.id;
-  console.log(editItem)
+  console.log(editItem);
   emit('paramsChanged', editItem, index);
 };
 
@@ -390,26 +402,15 @@ const removeRow = ({ data }) => {
   emit('rowDeleted', data);
 };
 
-const currentColoredParams = reactive({
-  parameters: [],
-  color: '',
-});
+const addColor = (data, field) => {
+  state.coloredGroups[data.id] = {};
+  state.coloredGroups[data.id].parameters = data.parameters;
+  state.coloredGroups[data.id].color = find(arrayColors, (item) => item[data.id])[data.id];
+};
+const deleteColor = (data, field) => {
+  delete state.coloredGroups[data.id];
+};
 
-const changeColor = (data) => {
-  currentColoredParams.parameters = data.parameters;
-  currentColoredParams.color = data.color;
-};
-const resetCurrentColor = (data) => {
-  currentColoredParams.parameters = [];
-  currentColoredParams.color = '';
-};
-const paintBackground = (data) => {
-  if (currentColoredParams.parameters.includes(data.screen_name)) {
-    return `background: ${currentColoredParams.color}`;
-  } else {
-    return '';
-  }
-};
 const showParameters = (data) => {
   state.showedAllParams = !state.showedAllParams;
   if (!state.showedAllParams) {
@@ -426,12 +427,15 @@ const closeForm = () => {
   state.isVisibleCreatingForm = false;
 };
 
+const paintDiv = (color) => {
+  return `background: #${color}`;
+}
+
 const addParameter = (newParameter) => {
   state.isVisibleCreatingForm = false;
-  console.log(newParameter)
-  emit('parameterAdded', newParameter)
-  
-}
+  console.log(newParameter);
+  emit('parameterAdded', newParameter);
+};
 </script>
 <style>
 .table {
