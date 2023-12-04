@@ -232,11 +232,10 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, reactive, onMounted } from 'vue';
+import { ref, computed, watch, reactive, onUpdated } from 'vue';
 import translateMapping from '@/mocks/translateMapping.js';
 import values from '@/mocks/dropDownValues.js';
 import { find } from 'lodash';
-import MyCreateForm from '@/components/MyCreateForm.vue';
 
 const props = defineProps({
   data: {
@@ -269,6 +268,9 @@ const arrayColors = [
 ];
 const editingRows = ref([]);
 const dataCopy = ref(props.data);
+onUpdated(() => {
+  dataCopy.value = props.data;
+});
 const allIdParameters = Object.keys(dataCopy.value);
 const dataKeys = computed(() => Object.keys(dataCopy.value));
 const dataCopyParams = ref([]);
@@ -429,7 +431,7 @@ const closeForm = () => {
 
 const paintDiv = (color) => {
   return `background: #${color}`;
-}
+};
 
 const addParameter = (newParameter) => {
   state.isVisibleCreatingForm = false;

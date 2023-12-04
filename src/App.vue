@@ -26,20 +26,20 @@ import { onBeforeMount } from 'vue';
 import { ref } from 'vue';
 
 const token = import.meta.env.VITE_SECRET_TOKEN;
-const url = import.meta.env.VITE_URL
+const url = import.meta.env.VITE_URL;
 
 let data = ref({});
 
 onBeforeMount(async () => {
   getDataFromServer(url, token)
     .then((result) => {
+      console.log(result);
       data.value = result.response.data.scriptParameters;
     })
     .catch((error) => {
       console.log(error);
-      component 
     });
-    isLoading.value = false;
+  isLoading.value = false;
 });
 
 const isLoading = ref(false);
@@ -79,7 +79,7 @@ const changeParams = async (newData, name) => {
 };
 
 const changeGroups = async (newData, name) => {
-  console.log(newData)
+  console.log(newData);
   isLoading.value = true;
   data.value[name] = newData;
   await putNewDataToServer(url, data.value, token)
