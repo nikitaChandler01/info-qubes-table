@@ -1,5 +1,4 @@
 import { createApp } from 'vue';
-import MyCreateForm from '@/components/MyCreateForm.vue';
 import ToastService from 'primevue/toastservice';
 import App from './App.vue';
 import router from './routes/index.js';
@@ -28,7 +27,6 @@ app
   .use(PrimeVue)
   .use(router)
   .use(ToastService)
-  .component('MyCreateForm', MyCreateForm)
   .component('DataTable', DataTable)
   .component('Column', Column)
   .component('TabMenu', TabMenu)

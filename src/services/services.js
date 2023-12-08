@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 export const randomizeParamName = (data) => {
   let result = '';
   const words = '0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';
@@ -56,4 +57,13 @@ export const putNewDataToServer = async function (urlToRequestDataFromServer, da
     console.log('Ошибка получения данных', error);
     return error;
   }
+};
+
+export const getRoute = (base) => {
+  const token = import.meta.env.VITE_SECRET_TOKEN;
+  const hostname = import.meta.env.VITE_HOSTNAME;
+  const port = import.meta.env.VITE_PORT;
+  const pathname = import.meta.env.VITE_PATHNAME;
+
+  return `http://${hostname}:${port}/${pathname}/${base}`;
 };

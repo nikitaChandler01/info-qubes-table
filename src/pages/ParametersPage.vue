@@ -1,5 +1,34 @@
 <template>
   <div class="data-container">
+    <div class="content__form">
+      <Dialog
+        v-model:visible="state.isVisibleEditingForm"
+        modal
+        header="Header"
+        style="width: 100%"
+      >
+        <template #container>
+          <EditingForm
+            @success="editParameter"
+            @cancel="closeForm"
+            :parameter="paramForEdit"
+            :parameters="allIdParameters"
+            succesText="Сохранить"
+            cancelText="Закрыть"
+          />
+        </template>
+      </Dialog>
+      <Dialog
+        v-model:visible="state.isVisibleCreatingForm"
+        modal
+        header="Header"
+        style="width: 100%"
+      >
+        <template #container>
+          <CreatingForm @success="addParameter" @cancel="closeForm" :parameters="allIdParameters" />
+        </template>
+      </Dialog>
+    </div>
     <div
       v-if="isLoading"
       :style="{
@@ -17,7 +46,6 @@
       />
     </div>
     <div v-else="dataCopy" class="content">
-      <div class="content__form"></div>
       <div class="content__tables">
         <div
           class="content__params"
@@ -33,7 +61,6 @@
             :value="dataCopyParams"
             editMode="row"
             dataKey="id"
-            @row-edit-save="onRowEditSave"
           >
             <Column :field="'screen_name'" header="Parameter/Параметр" style="width: 10%">
               <template #body="slotProps">
@@ -117,26 +144,14 @@
               :rowEditor="true"
               style="width: 10%; min-width: 8rem"
               bodyStyle="text-align:center"
-            />
+            >
+              <template #body="{ data }">
+                <Button label="Изменить" @click="editingParam(data)" />
+              </template>
+            </Column>
             <Column style="background-color: #f9fafb">
               <template #header>
-                <div class="content__form">
-                  <Button label="Создать" @click="state.isVisibleCreatingForm = true" />
-                  <Dialog
-                    v-model:visible="state.isVisibleCreatingForm"
-                    modal
-                    header="Header"
-                    style="width: 100%"
-                  >
-                    <template #container>
-                      <MyCreateForm
-                        @parameterAdded="addParameter"
-                        @canceledCreating="closeForm"
-                        :parameters="allIdParameters"
-                      />
-                    </template>
-                  </Dialog>
-                </div>
+                <Button label="Создать" @click="createParam" />
               </template>
               <template #body="slotProps">
                 <Button label="Удалить" severity="danger" @click="removeRow(slotProps)" />
@@ -284,6 +299,8 @@ import { ref, computed, watch, reactive, onUpdated } from 'vue';
 import translateMapping from '@/mocks/translateMapping.js';
 import values from '@/mocks/dropDownValues.js';
 import { find } from 'lodash';
+import CreatingForm from '@modules/CreatingForm.vue';
+import EditingForm from '@modules/EditingForm.vue';
 
 const props = defineProps({
   data: {
@@ -297,6 +314,7 @@ const props = defineProps({
 });
 const state = reactive({
   showedAllParams: true,
+  isVisibleEditingForm: false,
   isVisibleCreatingForm: false,
   coloredGroups: {},
 });
@@ -428,10 +446,9 @@ watch(
 
 const emit = defineEmits(['paramsChanged', 'groupsChanged', 'rowDeleted', 'parameterAdded']);
 
-const onRowEditSave = (event) => {
-  let editItem = {};
-  const index = event.newData.id;
-  editItem = event.newData;
+const editParameter = (editItem) => {
+  state.isVisibleEditingForm = false;
+  const index = editItem.id;
   delete editItem.id;
   emit('paramsChanged', editItem, index);
 };
@@ -487,11 +504,23 @@ const showAllParameters = (data) => {
 };
 const closeForm = () => {
   state.isVisibleCreatingForm = false;
+  state.isVisibleEditingForm = false;
 };
 
 const addParameter = (newParameter) => {
   state.isVisibleCreatingForm = false;
   emit('parameterAdded', newParameter);
+};
+
+const paramForEdit = ref({});
+
+const editingParam = (object) => {
+  paramForEdit.value = object;
+  state.isVisibleEditingForm = true;
+};
+
+const createParam = () => {
+  state.isVisibleCreatingForm = true;
 };
 </script>
 <style scoped>

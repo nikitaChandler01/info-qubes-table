@@ -1,23 +1,23 @@
 <template>
   <div class="container">
     <div class="formgrid grid">
-      <h2 class="field col-12">Форма создания параметра</h2>
+      <h2 class="field col-12">{{ props.formName }}</h2>
       <div class="field col-12 md:col-6">
         <label for="name">Название параметра</label>
-        <InputText id="name" v-model="creatingParam.name" />
+        <InputText id="name" v-model="valueItem.name" />
       </div>
       <div class="field col-12 md:col-6">
         <label for="short_name">Сокращённое название</label>
-        <InputText id="short_name" v-model="creatingParam.short_name" />
+        <InputText id="short_name" v-model="valueItem.short_name" />
       </div>
       <div class="field col-12">
         <label for="description">Описание</label>
-        <Textarea id="description" rows="5" v-model="creatingParam.description" />
+        <Textarea id="description" rows="5" v-model="valueItem.description" />
       </div>
       <div class="field col-12 md:col-3">
         <label for="is_negative">isNegative</label>
         <Dropdown
-          v-model="creatingParam.is_negative"
+          v-model="valueItem.is_negative"
           id="is_negative"
           style="appearance: auto"
           :options="values.isNegative"
@@ -29,7 +29,7 @@
       <div class="field col-12 md:col-3">
         <label for="type_name">type name</label>
         <Dropdown
-          v-model="creatingParam.type.name"
+          v-model="valueItem.type.name"
           id="type_name"
           style="appearance: auto"
           :options="values.typeName"
@@ -41,7 +41,7 @@
       <div class="field col-12 md:col-3">
         <label for="form_name">form name</label>
         <Dropdown
-          v-model="creatingParam.form.name"
+          v-model="valueItem.form.name"
           id="form_name"
           style="appearance: auto"
           :options="values.formName"
@@ -53,7 +53,7 @@
       <div class="field col-12 md:col-3">
         <label for="aggregation">aggregation</label>
         <Dropdown
-          v-model="creatingParam.aggregation"
+          v-model="valueItem.aggregation"
           id="aggregation"
           style="appearance: auto"
           :options="values.aggregation"
@@ -62,119 +62,59 @@
           placeholder="Выберите значение"
         />
       </div>
-      <div class="field col-12 md:col-6" v-if="creatingParam.type.name === 'keyword'">
+      <div class="field col-12 md:col-6" v-if="valueItem.type.name === 'keyword'">
         <label for="reference">reference</label>
-        <InputText id="reference" v-model="creatingParam.reference" />
+        <InputText id="reference" v-model="valueItem.reference" />
       </div>
     </div>
     <div style="display: flex; align-items: center; justify-content: space-between">
-      <p>ID параметра: {{ creatingParam.screen_name }}</p>
+      <p>ID параметра: {{ valueItem.screen_name }}</p>
       <div class="btn-group">
-        <Button label="Создать" severity="success" @click="createParam" />
-        <Button label="Отменить" severity="danger" @click="cancelCreating" />
+        <Button :label="props.successText" severity="success" @click="success" />
+        <Button :label="props.cancelText" severity="info" @click="cancel" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
 import { randomizeParamName } from '@services/services.js';
-import values from '../mocks/dropDownValues.js';
+import values from '@mocks/dropDownValues.js';
 
 const props = defineProps({
   parameters: {
     type: Array,
     required: true,
   },
-});
-const creatingParam = ref({
-  aggregation: '',
-  description: '',
-  form: {
-    name: '',
-    screen_name: '',
+  parameter: {
+    type: Object,
+    required: true,
   },
-  is_negative: '',
-  name: '',
-  reference: '',
-  role: {
-    screen_name: '',
-    name: '',
+  successText: {
+    type: String,
+    required: true,
   },
-  screen_name: randomizeParamName(props.parameters),
-  short_name: '',
-  track: {
-    name: '',
-    screen_name: '',
+  cancelText: {
+    type: String,
+    required: true,
   },
-  type: {
-    screen_name: '',
-    name: '',
+  formName: {
+    type: String,
+    required: true,
   },
 });
+const valueItem = props.parameter;
+const emit = defineEmits(['success', 'cancel']);
 
-const emit = defineEmits(['parameterAdded', 'canceledCreating']);
-
-const createParam = (event) => {
+const success = (event) => {
   event.preventDefault();
   let newParameter = {};
-  newParameter = creatingParam.value;
-  emit('parameterAdded', newParameter);
-  creatingParam.value = {
-    aggregation: '',
-    description: '',
-    form: {
-      name: '',
-      screen_name: '',
-    },
-    is_negative: '',
-    name: '',
-    reference: '',
-    role: {
-      screen_name: '',
-      name: '',
-    },
-    screen_name: randomizeParamName(props.params),
-    short_name: '',
-    track: {
-      name: '',
-      screen_name: '',
-    },
-    type: {
-      screen_name: '',
-      name: '',
-    },
-  };
+  newParameter = valueItem;
+  emit('success', newParameter);
 };
 
-const cancelCreating = () => {
-  emit('canceledCreating');
-  creatingParam.value = {
-    aggregation: '',
-    description: '',
-    form: {
-      name: '',
-      screen_name: '',
-    },
-    is_negative: '',
-    name: '',
-    reference: '',
-    role: {
-      screen_name: '',
-      name: '',
-    },
-    screen_name: randomizeParamName(props.parameters),
-    short_name: '',
-    track: {
-      name: '',
-      screen_name: '',
-    },
-    type: {
-      screen_name: '',
-      name: '',
-    },
-  };
+const cancel = () => {
+  emit('cancel');
 };
 </script>
 
@@ -206,11 +146,11 @@ const cancelCreating = () => {
 }
 .btn-group {
   display: flex;
-  width: 240px;
+  width: 440px;
   align-items: center;
 }
 .p-button {
-  width: 100px;
+  width: 200px;
   margin-right: 20px;
 }
 </style>

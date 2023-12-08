@@ -23,10 +23,10 @@ import MyMenuBar from '@/components/MyMenuBar.vue';
 import { useToast } from 'primevue/usetoast';
 import { getDataFromServer, putNewDataToServer } from '@services/index.js';
 import { ref } from 'vue';
+import { getRoute } from '@services/services';
 
-const token = import.meta.env.VITE_SECRET_TOKEN;
-const url = import.meta.env.VITE_URL;
-
+const token = import.meta.env.VITE_SECRET_TOKEN
+const url = getRoute('tmpParameters');
 let data = ref({});
 
 const isLoading = ref(true);
