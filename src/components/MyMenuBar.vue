@@ -16,9 +16,6 @@ const items = [
   { label: 'Parameters', command: () => {
       router.push({name: 'Parameters'});
     } , id: 1 },
-  { label: 'Group Type Name', command: () => {
-      router.push({name: 'GroupTypeName'});
-    } , id: 2 },
 ];
 </script>
 

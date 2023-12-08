@@ -1,11 +1,12 @@
 <template>
   <!-- <Message class="error-message" severity="error">Error Message</Message> -->
   <div class="container">
-    <div class="menuBar">
+    <div class="menu-bar">
       <MyMenuBar></MyMenuBar>
     </div>
     <div class="content">
       <RouterView
+        @rowDeleted="removeRow"
         @paramsChanged="changeParams"
         @groupsChanged="changeGroups"
         @parameterAdded="addParameter"
@@ -18,11 +19,9 @@
 </template>
 
 <script setup>
-import scriptParameters from '@/mocks/scriptParameters.js';
 import MyMenuBar from '@/components/MyMenuBar.vue';
 import { useToast } from 'primevue/usetoast';
 import { getDataFromServer, putNewDataToServer } from '@services/index.js';
-import { onBeforeMount } from 'vue';
 import { ref } from 'vue';
 
 const token = import.meta.env.VITE_SECRET_TOKEN;
@@ -30,105 +29,86 @@ const url = import.meta.env.VITE_URL;
 
 let data = ref({});
 
-onBeforeMount(async () => {
-  getDataFromServer(url, token)
+const isLoading = ref(true);
+const toast = useToast();
+getDataFromServer(url, token)
+  .then((result) => {
+    data.value = result.response.data.scriptParameters;
+    isLoading.value = false;
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+const changeParams = (newData, name) => {
+  isLoading.value = true;
+  data.value[name] = newData;
+  putNewDataToServer(url, data.value, token)
     .then((result) => {
-      console.log(result);
-      data.value = result.response.data.scriptParameters;
+      data.value = result.response.data.newScriptParameters.parameters;
+      isLoading.value = false;
+      toast.add({
+        severity: 'success',
+        summary: 'Данные изменены',
+        life: 5000,
+      });
     })
     .catch((error) => {
       console.log(error);
     });
-  isLoading.value = false;
-});
-
-const isLoading = ref(false);
-const toast = useToast();
-const changeParams = async (newData, name) => {
-  isLoading.value = true;
-  data.value[name] = newData;
-  await putNewDataToServer(url, data.value, token)
-    .then((result) => {
-      toast.add({
-        severity: 'success',
-        summary: 'Запрос отправлен',
-        detail: 'Данные изменены',
-        life: 5000,
-      });
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-    .then(() =>
-      getDataFromServer(url, token)
-        .then((result) => {
-          toast.add({
-            severity: 'success',
-            summary: 'Ответ получен',
-            detail: 'Данные загружены',
-            life: 5000,
-          });
-          data.value = result.response.data.scriptParameters;
-          console.log(data.value);
-        })
-        .catch((error) => {
-          console.log(error);
-        }),
-    );
-  isLoading.value = false;
 };
 
-const changeGroups = async (newData, name) => {
-  console.log(newData);
+const changeGroups = (newData, name) => {
   isLoading.value = true;
   data.value[name] = newData;
-  await putNewDataToServer(url, data.value, token)
-    .then(() => {
+  putNewDataToServer(url, data.value, token)
+    .then((result) => {
+      data.value = result.response.data.newScriptParameters.parameters;
+      isLoading.value = false;
       toast.add({
         severity: 'success',
-        summary: 'Запрос отправлен',
-        detail: 'Данные изменены',
+        summary: 'Данные изменены',
         life: 5000,
       });
     })
     .catch((error) => {
       console.log(error);
-    })
-    .then(() =>
-      getDataFromServer(url, token)
-        .then((result) => {
-          toast.add({
-            severity: 'success',
-            summary: 'Ответ получен',
-            detail: 'Данные загружены',
-            life: 5000,
-          });
-          data.value = result.response.data.scriptParameters;
-        })
-        .catch((error) => {
-          console.log(error);
-        }),
-    );
-  isLoading.value = false;
+    });
 };
 
 const addParameter = async (newParameter) => {
   isLoading.value = true;
   data.value[newParameter.screen_name] = newParameter;
-  await putNewDataToServer(url, data.value, token)
+  putNewDataToServer(url, data.value, token)
     .catch((error) => {
       console.log(error);
     })
-    .then(() =>
-      getDataFromServer(url, token)
-        .then((result) => {
-          data.value = result.response.data.scriptParameters;
-        })
-        .catch((error) => {
-          console.log(error);
-        }),
-    );
-  isLoading.value = false;
+    .then((result) => {
+      data.value = result.response.data.newScriptParameters.parameters;
+      isLoading.value = false;
+      toast.add({
+        severity: 'success',
+        summary: 'Параметр добавлен',
+        life: 5000,
+      });
+    });
+};
+const removeRow = (id, newGroups) => {
+  isLoading.value = true;
+  delete data.value[id];
+  Object.assign(data.value, newGroups);
+  putNewDataToServer(url, data.value, token)
+    .catch((error) => {
+      console.log(error);
+    })
+    .then((result) => {
+      data.value = result.response.data.newScriptParameters.parameters;
+      isLoading.value = false;
+      toast.add({
+        severity: 'success',
+        summary: 'Параметр удалён',
+        life: 5000,
+      });
+    });
 };
 </script>
 
@@ -139,6 +119,7 @@ body {
 }
 .container {
   overflow: hidden;
+  height: 100vh;
 }
 .error-message {
   position: absolute;
@@ -146,8 +127,11 @@ body {
   width: 300px;
 }
 .content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  position: relative;
+  height: calc(100vh - 70px);
+}
+.menu-bar {
+  position: relative;
+  z-index: 100;
 }
 </style>
