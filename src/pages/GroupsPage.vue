@@ -90,7 +90,6 @@
           <Column field="name" header="Name/Имя" style="width: 15%">
             <template #body="{ data, field }">
               <div style="display: flex">
-                <div class="color-box" :style="`background: ${data.color}`" />
                 {{ data[field] }}
               </div>
             </template>
@@ -120,7 +119,7 @@
                   :itemSize="20"
                   class="border-1 surface-border border-round"
                   :style="{
-                    width: 200 + 'px',
+                    width: 100 + '%',
                     height: 202 + 'px',
                   }"
                 >
@@ -143,7 +142,7 @@
                   :itemSize="20"
                   class="border-1 surface-border border-round"
                   :style="{
-                    width: 200 + 'px',
+                    width: 100 + '%',
                     height: 102 + 'px',
                   }"
                 >
@@ -157,22 +156,33 @@
                   </template>
                 </VirtualScroller>
               </div>
-              <div v-else-if="data.parameters.length < 2" class="card flex justify-content-center">
+              <div
+                v-else-if="data.parameters.length < 2"
+                class="card flex justify-content-center"
+                style="width: 100%"
+              >
                 {{ data.parametersNames[0] }}
               </div>
             </template>
           </Column>
-          <Column>
-            <template #body="{ data }">
-              <Button label="Изменить" @click="editingGroup(data)" />
-            </template>
-          </Column>
           <Column style="background-color: #f9fafb">
             <template #header>
-              <Button label="Создать" @click="createGroup" />
+              <Button label="Создать" @click="createParam" style="width: 120px" />
             </template>
             <template #body="slotProps">
-              <Button label="Удалить" severity="danger" @click="removeRow(slotProps)" />
+              <div class="action-group">
+                <Button
+                  label="Изменить"
+                  @click="editingGroup(slotProps.data)"
+                  style="width: 120px; margin-bottom: 10px"
+                />
+                <Button
+                  label="Удалить"
+                  severity="danger"
+                  @click="removeRow(slotProps)"
+                  style="width: 120px"
+                />
+              </div>
             </template>
           </Column>
           <template #expansion="slotProps">
@@ -339,7 +349,7 @@ for (const group of dataCopyGroups.value) {
   item.name = group.name;
   item.description = group.description;
   item.short_name = group['short_name'];
-  item.aggregation = group.aggregation ?? ''
+  item.aggregation = group.aggregation ?? '';
   item.type = group.type;
   item.parameters = group.parameters;
   item.parametersNames = group.parameters.map((param) => dataCopy.value[param].name);
@@ -358,7 +368,7 @@ watch(
     for (const group of newDataCopyGroups.value) {
       const item = {};
       item.id = group.id;
-      item.aggregation = group.aggregation ?? ''
+      item.aggregation = group.aggregation ?? '';
       item.name = group.name;
       item.description = group.description;
       item.short_name = group['short_name'];
@@ -453,9 +463,13 @@ const createGroup = () => {
 .hidden {
   display: none;
 }
-.card {
+.p-multiselect {
+  padding: 0;
+  margin: 0;
+}
+.action-group {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 </style>

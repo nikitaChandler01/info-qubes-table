@@ -126,17 +126,24 @@
                 />
               </template>
             </Column>
-            <Column>
-              <template #body="{ data }">
-                <Button label="Изменить" @click="editingParam(data)" />
-              </template>
-            </Column>
             <Column style="background-color: #f9fafb">
               <template #header>
-                <Button label="Создать" @click="createParam" />
+                <Button label="Создать" @click="createParam" style="width: 120px" />
               </template>
               <template #body="slotProps">
-                <Button label="Удалить" severity="danger" @click="removeRow(slotProps)" />
+                <div class="action-group">
+                  <Button
+                    label="Изменить"
+                    @click="editingParam(slotProps.data)"
+                    style="width: 120px; margin-bottom: 10px"
+                  />
+                  <Button
+                    label="Удалить"
+                    severity="danger"
+                    @click="removeRow(slotProps)"
+                    style="width: 120px"
+                  />
+                </div>
               </template>
             </Column>
           </DataTable>

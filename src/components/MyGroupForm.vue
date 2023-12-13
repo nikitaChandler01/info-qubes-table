@@ -83,7 +83,6 @@ const props = defineProps({
   },
 });
 const valueItem = props.group;
-console.log(valueItem)
 const emit = defineEmits(['success', 'cancel']);
 
 const success = (event) => {
