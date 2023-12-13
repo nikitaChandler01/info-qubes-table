@@ -23,19 +23,10 @@ const props = defineProps({
 });
 const formName = 'Форма изменения параметра'
 const editingParam = props.parameter;
-console.log(editingParam)
 const successText = 'Изменить параметр';
 const cancelText = 'Закрыть форму';
 
 const emit = defineEmits(['parameterAdded', 'canceledCreating']);
-
-// const editParam = () => {
-//   emit('success', editingParam);
-// };
-
-// const cancelEditing = () => {
-//   emit('cancel');
-// };
 </script>
 
 <style scoped>

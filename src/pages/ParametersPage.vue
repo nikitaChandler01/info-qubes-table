@@ -231,13 +231,13 @@ watch(
   },
 );
 
-const emit = defineEmits(['paramChanged', 'rowDeleted', 'parameterAdded']);
+const emit = defineEmits(['dataChanged', 'rowDeleted', 'dataAdded']);
 
 const editParameter = (editItem) => {
   state.isVisibleEditingForm = false;
   const index = editItem.id;
   delete editItem.id;
-  emit('paramChanged', editItem, index);
+  emit('dataChanged', editItem, 'Параметр', editItem.name, index);
 };
 
 const removeRow = ({ data }) => {
@@ -262,7 +262,7 @@ const closeForm = () => {
 
 const addParameter = (newParameter) => {
   state.isVisibleCreatingForm = false;
-  emit('parameterAdded', newParameter);
+  emit('dataAdded', newParameter, 'Параметр', newParameter.name, newParameter.screen_name);
 };
 
 let paramForEdit = {};
@@ -294,5 +294,4 @@ const createParam = () => {
 .hidden {
   display: none;
 }
-
 </style>

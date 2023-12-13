@@ -20,7 +20,7 @@ const props = defineProps({
     required: true,
   },
 });
-const editingGroup = props.group.value;
+const editingGroup = props.group;
 editingGroup.parametersForChoose = props.parameters;
 const formName = 'Форма изменения группы';
 const successText = 'Изменить группу';

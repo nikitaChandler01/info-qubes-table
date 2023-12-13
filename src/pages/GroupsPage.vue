@@ -64,7 +64,6 @@
           :value="rowsGroup"
           editMode="row"
           dataKey="id"
-          @row-edit-save="onRowGroupEditSave"
         >
           <template #header>
             <div class="flex flex-wrap justify-content-end gap-2">
@@ -84,8 +83,8 @@
           </template>
           <Column expander style="width: 5rem" />
           <Column field="id" header="Группа" style="width: 15%">
-            <template #editor="{ data, field }">
-              <InputText v-model="data[field]" />
+            <template #body="{ data, field }">
+              {{ data[field] }}
             </template>
           </Column>
           <Column field="name" header="Name/Имя" style="width: 15%">
@@ -95,13 +94,10 @@
                 {{ data[field] }}
               </div>
             </template>
-            <template #editor="{ data, field }">
-              <InputText v-model="data[field]" />
-            </template>
           </Column>
-          <Column field="shortName" header="Short Name/Сокращение" style="width: 15%">
-            <template #editor="{ data, field }">
-              <InputText v-model="data[field]" />
+          <Column field="short_name" header="Short Name/Сокращение" style="width: 15%">
+            <template #body="{ data, field }">
+              {{ data[field] }}
             </template>
           </Column>
           <Column field="type" header="type name" style="width: 15%">
@@ -118,7 +114,7 @@
           </Column>
           <Column header="Parameters/Параметры" style="width: 15%">
             <template #body="{ data }">
-              <div v-if="data.parametersNames.length > 2" class="card flex justify-content-center">
+              <div v-if="data.parameters.length > 2" class="card flex justify-content-center">
                 <VirtualScroller
                   :items="data.parametersNames"
                   :itemSize="20"
@@ -139,7 +135,7 @@
                 </VirtualScroller>
               </div>
               <div
-                v-else-if="data.parametersNames.length === 2"
+                v-else-if="data.parameters.length === 2"
                 class="card flex justify-content-center"
               >
                 <VirtualScroller
@@ -161,10 +157,7 @@
                   </template>
                 </VirtualScroller>
               </div>
-              <div
-                v-else-if="data.parametersNames.length < 2"
-                class="card flex justify-content-center"
-              >
+              <div v-else-if="data.parameters.length < 2" class="card flex justify-content-center">
                 {{ data.parametersNames[0] }}
               </div>
             </template>
@@ -245,7 +238,6 @@
 <script setup>
 import { ref, watch, reactive, onUpdated } from 'vue';
 import translateMapping from '@mocks/translateMapping.js';
-import values from '@mocks/dropDownValues.js';
 import CreatingForm from '@modules/GroupForms/CreatingForm.vue';
 import EditingForm from '@modules/GroupForms/EditingForm.vue';
 
@@ -346,7 +338,8 @@ for (const group of dataCopyGroups.value) {
   item.id = group.id;
   item.name = group.name;
   item.description = group.description;
-  item.shortName = group['short_name'];
+  item.short_name = group['short_name'];
+  item.aggregation = group.aggregation ?? ''
   item.type = group.type;
   item.parameters = group.parameters;
   item.parametersNames = group.parameters.map((param) => dataCopy.value[param].name);
@@ -365,9 +358,10 @@ watch(
     for (const group of newDataCopyGroups.value) {
       const item = {};
       item.id = group.id;
+      item.aggregation = group.aggregation ?? ''
       item.name = group.name;
       item.description = group.description;
-      item.shortName = group['short_name'];
+      item.short_name = group['short_name'];
       item.type = group.type;
       item.parameters = group.parameters;
       item.parametersNames = group.parameters.map((param) => dataCopy.value[param].name);
@@ -385,22 +379,7 @@ watch(
   },
 );
 
-const emit = defineEmits(['paramsChanged', 'groupsChanged', 'rowDeleted', 'groupAdded']);
-
-const onRowGroupEditSave = (event) => {
-  let editItem = {};
-  const index = event.newData.id;
-  editItem = event.newData;
-  editItem.parameters = [];
-  for (const selectedParameter of editItem.selectedParameters) {
-    editItem.parameters.push(selectedParameter.value);
-  }
-  delete editItem.selectedParameters;
-  delete editItem.id;
-  delete editItem.count;
-  delete editItem.parametersNames;
-  emit('groupsChanged', editItem, index);
-};
+const emit = defineEmits(['dataChanged', 'rowDeleted', 'dataAdded']);
 
 const removeRow = ({ data }) => {
   const newGroups = {};
@@ -416,11 +395,6 @@ const removeRow = ({ data }) => {
   emit('rowDeleted', idOfDeletedItem, newGroups, 'Группа', data.name);
 };
 
-const closeForm = () => {
-  state.isVisibleCreatingForm = false;
-  state.isVisibleEditingForm = false;
-};
-
 const addGroup = (newGroup) => {
   state.isVisibleCreatingForm = false;
   newGroup.selectedParameters.forEach(({ _, value }) => {
@@ -430,13 +404,13 @@ const addGroup = (newGroup) => {
   delete newGroup.parametersForChoose;
   const index = newGroup.screen_name;
   delete newGroup.screen_name;
-  emit('groupAdded', newGroup, index);
+  emit('dataAdded', newGroup, 'Группа', newGroup.name, index);
 };
 
-const groupForEdit = {};
+let groupForEdit = {};
 
 const editingGroup = (object) => {
-  groupForEdit.value = object;
+  groupForEdit = object;
   state.isVisibleEditingForm = true;
 };
 
@@ -450,9 +424,13 @@ const editGroup = (newGroup) => {
   delete newGroup.parametersForChoose;
   delete newGroup.parametersNames;
   delete newGroup.selectedParameters;
-  emit('groupChanged', newGroup, index);
+  emit('dataChanged', newGroup, 'Группа', newGroup.name, index);
 };
-
+const closeForm = () => {
+  groupForEdit = {};
+  state.isVisibleCreatingForm = false;
+  state.isVisibleEditingForm = false;
+};
 const createGroup = () => {
   state.isVisibleCreatingForm = true;
 };

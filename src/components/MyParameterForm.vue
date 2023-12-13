@@ -68,7 +68,6 @@
       </div>
     </div>
     <div style="display: flex; align-items: center; justify-content: space-between">
-      <p>ID параметра: {{ valueItem.screen_name }}</p>
       <div class="btn-group">
         <Button :label="props.successText" severity="success" @click="success" />
         <Button :label="props.cancelText" severity="info" @click="cancel" />

@@ -49,67 +49,6 @@ const successText = 'Создать параметр';
 const cancelText = 'Закрыть форму';
 
 const emit = defineEmits(['parameterAdded', 'canceledCreating']);
-
-// const createParam = (event) => {
-//   event.preventDefault();
-//   let newParameter = {};
-//   newParameter = creatingParam.value;
-//   emit('parameterAdded', newParameter);
-//   creatingParam.value = {
-//     aggregation: '',
-//     description: '',
-//     form: {
-//       name: '',
-//       screen_name: '',
-//     },
-//     is_negative: '',
-//     name: '',
-//     reference: '',
-//     role: {
-//       screen_name: '',
-//       name: '',
-//     },
-//     screen_name: randomizeParamName(props.params),
-//     short_name: '',
-//     track: {
-//       name: '',
-//       screen_name: '',
-//     },
-//     type: {
-//       screen_name: '',
-//       name: '',
-//     },
-//   };
-// };
-
-// const cancelCreating = () => {
-//   emit('canceledCreating');
-//   creatingParam.value = {
-//     aggregation: '',
-//     description: '',
-//     form: {
-//       name: '',
-//       screen_name: '',
-//     },
-//     is_negative: '',
-//     name: '',
-//     reference: '',
-//     role: {
-//       screen_name: '',
-//       name: '',
-//     },
-//     screen_name: randomizeParamName(props.parameters),
-//     short_name: '',
-//     track: {
-//       name: '',
-//       screen_name: '',
-//     },
-//     type: {
-//       screen_name: '',
-//       name: '',
-//     },
-//   };
-// };
 </script>
 
 <style scoped>

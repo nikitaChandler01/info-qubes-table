@@ -7,10 +7,8 @@
       <component
         :is="currentTab"
         @rowDeleted="removeRow"
-        @paramChanged="changeParams"
-        @groupChanged="changeGroups"
-        @parameterAdded="addData"
-        @groupAdded="addData"
+        @dataChanged="changeData"
+        @dataAdded="addData"
         :data="data"
         :isLoading="isLoading"
       />
@@ -57,47 +55,41 @@ getDataFromServer(url, token)
   .catch((error) => {
     console.log(error);
   });
-const changeParams = (newData, name) => {
+
+  
+const changeData = (newData, type, name, id) => {
   isLoading.value = true;
-  data.value[name] = newData;
+  newData.type.name === 'group'
+    ? (data.value[id] = newData)
+    : (data.value[id] = newData);
   putNewDataToServer(url, data.value, token)
+    .catch((error) => {
+      console.log(error);
+    })
     .then((result) => {
       data.value = result.response.data.newScriptParameters.parameters;
       isLoading.value = false;
-      toast.add({
-        severity: 'success',
-        summary: 'Данные изменены',
-        life: 5000,
-      });
-    })
-    .catch((error) => {
-      console.log(error);
+      if (type === 'Параметр') {
+        toast.add({
+          severity: 'success',
+          summary: `${type} "${name}" изменён`,
+          life: 5000,
+        });
+      } else {
+        toast.add({
+          severity: 'success',
+          summary: `${type} "${name}" изменена`,
+          life: 5000,
+        });
+      }
     });
 };
 
-const changeGroups = (newData, id) => {
-  isLoading.value = true;
-  data.value[id] = newData;
-  putNewDataToServer(url, data.value, token)
-    .then((result) => {
-      data.value = result.response.data.newScriptParameters.parameters;
-      isLoading.value = false;
-      toast.add({
-        severity: 'success',
-        summary: 'Данные изменены',
-        life: 5000,
-      });
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-
-const addData = (newParameter, index) => {
+const addData = (newParameter, type, name, id) => {
   isLoading.value = true;
   newParameter.type.name === 'group'
-    ? (data.value[index] = newParameter)
-    : (data.value[newParameter.screen_name] = newParameter);
+    ? (data.value[id] = newParameter)
+    : (data.value[id] = newParameter);
   putNewDataToServer(url, data.value, token)
     .catch((error) => {
       console.log(error);
@@ -105,11 +97,19 @@ const addData = (newParameter, index) => {
     .then((result) => {
       data.value = result.response.data.newScriptParameters.parameters;
       isLoading.value = false;
-      toast.add({
-        severity: 'success',
-        summary: 'Параметр добавлен',
-        life: 5000,
-      });
+      if (type === 'Параметр') {
+        toast.add({
+          severity: 'success',
+          summary: `${type} "${name}" добавлен`,
+          life: 5000,
+        });
+      } else {
+        toast.add({
+          severity: 'success',
+          summary: `${type} "${name}" добавлена`,
+          life: 5000,
+        });
+      }
     });
 };
 const removeRow = (id, newGroups, type, name) => {

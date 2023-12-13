@@ -8,7 +8,7 @@
       </div>
       <div class="field col-12 md:col-6">
         <label for="name">Сокращённое название</label>
-        <InputText id="name" v-model="valueItem.shortName" />
+        <InputText id="name" v-model="valueItem.short_name" />
       </div>
       <div class="field col-12">
         <label for="description">Описание</label>
@@ -30,7 +30,6 @@
       <div class="field col-12 md:col-3">
         <label for="type_name">Параметры группы</label>
         <MultiSelect
-          style="margin-top: 10px"
           v-model="valueItem.selectedParameters"
           :options="valueItem.parametersForChoose"
           filter
@@ -84,6 +83,7 @@ const props = defineProps({
   },
 });
 const valueItem = props.group;
+console.log(valueItem)
 const emit = defineEmits(['success', 'cancel']);
 
 const success = (event) => {
@@ -134,6 +134,7 @@ const cancel = () => {
   margin-right: 20px;
 }
 .p-multiselect {
-  width: 200px;
+  margin-top: 10px;
+  width: 100%;
 }
 </style>
