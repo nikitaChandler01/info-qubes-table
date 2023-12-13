@@ -3,32 +3,21 @@
     <div class="formgrid grid">
       <h2 class="field col-12">{{ props.formName }}</h2>
       <div class="field col-12 md:col-6">
-        <label for="name">Название параметра</label>
+        <label for="name">Название группы</label>
         <InputText id="name" v-model="valueItem.name" />
       </div>
       <div class="field col-12 md:col-6">
-        <label for="short_name">Сокращённое название</label>
-        <InputText id="short_name" v-model="valueItem.short_name" />
+        <label for="name">Сокращённое название</label>
+        <InputText id="name" v-model="valueItem.shortName" />
       </div>
       <div class="field col-12">
         <label for="description">Описание</label>
         <Textarea id="description" rows="5" v-model="valueItem.description" />
       </div>
       <div class="field col-12 md:col-3">
-        <label for="is_negative">isNegative</label>
-        <Dropdown
-          v-model="valueItem.is_negative"
-          id="is_negative"
-          style="appearance: auto"
-          :options="values.isNegative"
-          optionLabel="name"
-          optionValue="value"
-          placeholder="Выберите значение"
-        />
-      </div>
-      <div class="field col-12 md:col-3">
         <label for="type_name">type name</label>
         <Dropdown
+          disabled
           v-model="valueItem.type.name"
           id="type_name"
           style="appearance: auto"
@@ -39,15 +28,15 @@
         />
       </div>
       <div class="field col-12 md:col-3">
-        <label for="form_name">form name</label>
-        <Dropdown
-          v-model="valueItem.form.name"
-          id="form_name"
-          style="appearance: auto"
-          :options="values.formName"
+        <label for="type_name">Параметры группы</label>
+        <MultiSelect
+          style="margin-top: 10px"
+          v-model="valueItem.selectedParameters"
+          :options="valueItem.parametersForChoose"
+          filter
           optionLabel="name"
-          optionValue="value"
-          placeholder="Выберите значение"
+          placeholder="Выберите параметр"
+          :maxSelectedLabels="2"
         />
       </div>
       <div class="field col-12 md:col-3">
@@ -62,13 +51,9 @@
           placeholder="Выберите значение"
         />
       </div>
-      <div class="field col-12 md:col-6" v-if="valueItem.type.name === 'keyword'">
-        <label for="reference">reference</label>
-        <InputText id="reference" v-model="valueItem.reference" />
-      </div>
     </div>
     <div style="display: flex; align-items: center; justify-content: space-between">
-      <p>ID параметра: {{ valueItem.screen_name }}</p>
+      <!-- <p>ID группы: {{ valueItem.screen_name }}</p> -->
       <div class="btn-group">
         <Button :label="props.successText" severity="success" @click="success" />
         <Button :label="props.cancelText" severity="info" @click="cancel" />
@@ -78,15 +63,10 @@
 </template>
 
 <script setup>
-import { randomizeParamName } from '@services/services.js';
 import values from '@mocks/dropDownValues.js';
 
 const props = defineProps({
-  parameters: {
-    type: Array,
-    required: true,
-  },
-  parameter: {
+  group: {
     type: Object,
     required: true,
   },
@@ -103,14 +83,14 @@ const props = defineProps({
     required: true,
   },
 });
-const valueItem = props.parameter;
+const valueItem = props.group;
 const emit = defineEmits(['success', 'cancel']);
 
 const success = (event) => {
   event.preventDefault();
-  let newParameter = {};
-  newParameter = valueItem;
-  emit('success', newParameter);
+  let newGroup = {};
+  newGroup = valueItem;
+  emit('success', newGroup);
 };
 
 const cancel = () => {
@@ -152,5 +132,8 @@ const cancel = () => {
 .p-button {
   width: 200px;
   margin-right: 20px;
+}
+.p-multiselect {
+  width: 200px;
 }
 </style>

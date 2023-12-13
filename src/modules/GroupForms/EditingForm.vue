@@ -1,40 +1,32 @@
 <template>
-  <MyForm 
-  :parameters="props.parameters"
-  :parameter="editingParam"
-  :successText="successText"
-  :cancelText="cancelText"
-  :formName="formName"
+  <MyGroupForm
+    :group="editingGroup"
+    :successText="successText"
+    :cancelText="cancelText"
+    :formName="formName"
   />
 </template>
 
 <script setup>
-import MyForm from '@components/MyForm.vue';
+import MyGroupForm from '@components/MyGroupForm.vue';
 
 const props = defineProps({
+  group: {
+    type: Object,
+    required: true,
+  },
   parameters: {
     type: Array,
     required: true,
   },
-  parameter: {
-    type: Object,
-    required: true,
-  },
 });
-const formName = 'Форма изменения параметра'
-const editingParam = props.parameter;
-const successText = 'Изменить параметр';
+const editingGroup = props.group.value;
+editingGroup.parametersForChoose = props.parameters;
+const formName = 'Форма изменения группы';
+const successText = 'Изменить группу';
 const cancelText = 'Закрыть форму';
 
 const emit = defineEmits(['parameterAdded', 'canceledCreating']);
-
-const editParam = () => {
-  emit('success', editingParam);
-};
-
-const cancelEditing = () => {
-  emit('cancel');
-};
 </script>
 
 <style scoped>

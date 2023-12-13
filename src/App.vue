@@ -1,15 +1,16 @@
 <template>
-  <!-- <Message class="error-message" severity="error">Error Message</Message> -->
   <div class="container">
     <div class="menu-bar">
-      <MyMenuBar></MyMenuBar>
+      <TabMenu :model="tables" />
     </div>
     <div class="content">
-      <RouterView
+      <component
+        :is="currentTab"
         @rowDeleted="removeRow"
-        @paramsChanged="changeParams"
-        @groupsChanged="changeGroups"
-        @parameterAdded="addParameter"
+        @paramChanged="changeParams"
+        @groupChanged="changeGroups"
+        @parameterAdded="addData"
+        @groupAdded="addData"
         :data="data"
         :isLoading="isLoading"
       />
@@ -19,16 +20,33 @@
 </template>
 
 <script setup>
-import MyMenuBar from '@/components/MyMenuBar.vue';
+import ParametersPage from '@pages/ParametersPage.vue';
+import GroupsPage from '@pages/GroupsPage.vue';
 import { useToast } from 'primevue/usetoast';
 import { getDataFromServer, putNewDataToServer } from '@services/index.js';
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 import { getRoute } from '@services/services';
 
-const token = import.meta.env.VITE_SECRET_TOKEN
+const token = import.meta.env.VITE_SECRET_TOKEN;
 const url = getRoute('tmpParameters');
 let data = ref({});
 
+const currentTab = shallowRef(ParametersPage);
+const tables = [
+  {
+    label: 'Управление параметрами',
+    command: () => {
+      currentTab.value = ParametersPage;
+    },
+  },
+  {
+    label: 'Управление группами',
+    command: () => {
+      currentTab.value = GroupsPage;
+    },
+  },
+  { label: 'Привязка параметров', command: () => {} },
+];
 const isLoading = ref(true);
 const toast = useToast();
 getDataFromServer(url, token)
@@ -57,9 +75,9 @@ const changeParams = (newData, name) => {
     });
 };
 
-const changeGroups = (newData, name) => {
+const changeGroups = (newData, id) => {
   isLoading.value = true;
-  data.value[name] = newData;
+  data.value[id] = newData;
   putNewDataToServer(url, data.value, token)
     .then((result) => {
       data.value = result.response.data.newScriptParameters.parameters;
@@ -75,9 +93,11 @@ const changeGroups = (newData, name) => {
     });
 };
 
-const addParameter = async (newParameter) => {
+const addData = (newParameter, index) => {
   isLoading.value = true;
-  data.value[newParameter.screen_name] = newParameter;
+  newParameter.type.name === 'group'
+    ? (data.value[index] = newParameter)
+    : (data.value[newParameter.screen_name] = newParameter);
   putNewDataToServer(url, data.value, token)
     .catch((error) => {
       console.log(error);
@@ -92,7 +112,7 @@ const addParameter = async (newParameter) => {
       });
     });
 };
-const removeRow = (id, newGroups) => {
+const removeRow = (id, newGroups, type, name) => {
   isLoading.value = true;
   delete data.value[id];
   Object.assign(data.value, newGroups);
@@ -103,11 +123,19 @@ const removeRow = (id, newGroups) => {
     .then((result) => {
       data.value = result.response.data.newScriptParameters.parameters;
       isLoading.value = false;
-      toast.add({
-        severity: 'success',
-        summary: 'Параметр удалён',
-        life: 5000,
-      });
+      if (type === 'Параметр') {
+        toast.add({
+          severity: 'success',
+          summary: `${type} "${name}" удалён`,
+          life: 5000,
+        });
+      } else {
+        toast.add({
+          severity: 'success',
+          summary: `${type} "${name}" удалена`,
+          life: 5000,
+        });
+      }
     });
 };
 </script>

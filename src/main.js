@@ -1,7 +1,6 @@
 import { createApp } from 'vue';
 import ToastService from 'primevue/toastservice';
 import App from './App.vue';
-import router from './routes/index.js';
 import PrimeVue from 'primevue/config';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -25,7 +24,6 @@ import 'primeicons/primeicons.css'
 const app = createApp(App);
 app
   .use(PrimeVue)
-  .use(router)
   .use(ToastService)
   .component('DataTable', DataTable)
   .component('Column', Column)

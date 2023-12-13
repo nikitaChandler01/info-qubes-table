@@ -1,7 +1,7 @@
 <template>
-<MyForm 
+<MyParameterForm 
   :parameters="props.parameters"
-  :parameter="creatingParam"
+  :parameter="paramForCreating"
   :successText="successText"
   :cancelText="cancelText"
   :formName="formName"
@@ -11,7 +11,7 @@
 <script setup>
 import { ref } from 'vue';
 import { randomizeParamName } from '@services/services.js';
-import MyForm from '@components/MyForm.vue';
+import MyParameterForm from '@components/MyParameterForm.vue';
 
 const props = defineProps({
   parameters: {
@@ -19,7 +19,7 @@ const props = defineProps({
     required: true,
   },
 });
-const creatingParam = ref({
+const paramForCreating = ref({
   aggregation: '',
   description: '',
   form: {
@@ -50,66 +50,66 @@ const cancelText = 'Закрыть форму';
 
 const emit = defineEmits(['parameterAdded', 'canceledCreating']);
 
-const createParam = (event) => {
-  event.preventDefault();
-  let newParameter = {};
-  newParameter = creatingParam.value;
-  emit('parameterAdded', newParameter);
-  creatingParam.value = {
-    aggregation: '',
-    description: '',
-    form: {
-      name: '',
-      screen_name: '',
-    },
-    is_negative: '',
-    name: '',
-    reference: '',
-    role: {
-      screen_name: '',
-      name: '',
-    },
-    screen_name: randomizeParamName(props.params),
-    short_name: '',
-    track: {
-      name: '',
-      screen_name: '',
-    },
-    type: {
-      screen_name: '',
-      name: '',
-    },
-  };
-};
+// const createParam = (event) => {
+//   event.preventDefault();
+//   let newParameter = {};
+//   newParameter = creatingParam.value;
+//   emit('parameterAdded', newParameter);
+//   creatingParam.value = {
+//     aggregation: '',
+//     description: '',
+//     form: {
+//       name: '',
+//       screen_name: '',
+//     },
+//     is_negative: '',
+//     name: '',
+//     reference: '',
+//     role: {
+//       screen_name: '',
+//       name: '',
+//     },
+//     screen_name: randomizeParamName(props.params),
+//     short_name: '',
+//     track: {
+//       name: '',
+//       screen_name: '',
+//     },
+//     type: {
+//       screen_name: '',
+//       name: '',
+//     },
+//   };
+// };
 
-const cancelCreating = () => {
-  emit('canceledCreating');
-  creatingParam.value = {
-    aggregation: '',
-    description: '',
-    form: {
-      name: '',
-      screen_name: '',
-    },
-    is_negative: '',
-    name: '',
-    reference: '',
-    role: {
-      screen_name: '',
-      name: '',
-    },
-    screen_name: randomizeParamName(props.parameters),
-    short_name: '',
-    track: {
-      name: '',
-      screen_name: '',
-    },
-    type: {
-      screen_name: '',
-      name: '',
-    },
-  };
-};
+// const cancelCreating = () => {
+//   emit('canceledCreating');
+//   creatingParam.value = {
+//     aggregation: '',
+//     description: '',
+//     form: {
+//       name: '',
+//       screen_name: '',
+//     },
+//     is_negative: '',
+//     name: '',
+//     reference: '',
+//     role: {
+//       screen_name: '',
+//       name: '',
+//     },
+//     screen_name: randomizeParamName(props.parameters),
+//     short_name: '',
+//     track: {
+//       name: '',
+//       screen_name: '',
+//     },
+//     type: {
+//       screen_name: '',
+//       name: '',
+//     },
+//   };
+// };
 </script>
 
 <style scoped>
