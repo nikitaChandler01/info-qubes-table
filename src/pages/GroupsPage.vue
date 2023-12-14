@@ -82,36 +82,41 @@
             </div>
           </template>
           <Column expander style="width: 5rem" />
-          <Column field="id" header="Группа" style="width: 15%">
+          <Column field="id" header="Группа" style="width: 5%">
             <template #body="{ data, field }">
               {{ data[field] }}
             </template>
           </Column>
-          <Column field="name" header="Name/Имя" style="width: 15%">
+          <Column field="name" header="Name/Имя" style="width: 10%">
             <template #body="{ data, field }">
               <div style="display: flex">
                 {{ data[field] }}
               </div>
             </template>
           </Column>
-          <Column field="short_name" header="Short Name/Сокращение" style="width: 15%">
+          <Column field="short_name" header="Short Name/Сокращение" style="width: 10%">
             <template #body="{ data, field }">
               {{ data[field] }}
             </template>
           </Column>
-          <Column field="type" header="type name" style="width: 15%">
+          <Column field="description" header="Описание" style="width: 30%">
+            <template #body="{ data, field }">
+              {{ data[field] }}
+            </template>
+          </Column>
+          <Column field="type" header="type name" style="text-align: center;">
             <template #body="{ data }">
               {{ translateMapping[data.type.name]() }}
             </template>
           </Column>
-          <Column field="count" header="Count of params/Количество параметров" style="width: 15%">
+          <Column field="count" header="Count of params/Количество параметров" style="width: 5%">
             <template #body="{ data }">
               <div style="display: flex; justify-content: center">
                 <span style="text-align: center">{{ data.count }}</span>
               </div>
             </template>
           </Column>
-          <Column header="Parameters/Параметры" style="width: 15%">
+          <Column header="Parameters/Параметры" style="width: 350px">
             <template #body="{ data }">
               <div v-if="data.parameters.length > 2" class="card flex justify-content-center">
                 <VirtualScroller
@@ -167,7 +172,7 @@
           </Column>
           <Column style="background-color: #f9fafb">
             <template #header>
-              <Button label="Создать" @click="createParam" style="width: 120px" />
+              <Button label="Создать" @click="createGroup" style="width: 120px" />
             </template>
             <template #body="slotProps">
               <div class="action-group">
