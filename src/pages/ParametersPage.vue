@@ -57,6 +57,7 @@
             scrollable
             scrollHeight="95vh"
             class="table params"
+            :loading="isLoading"
             :value="dataCopyParams"
             editMode="row"
             dataKey="id"
@@ -182,6 +183,7 @@ const allIdParameters = Object.keys(dataCopy.value);
 const dataCopyParams = ref([]);
 
 onUpdated(() => {
+  console.log('wow')
   dataCopy.value = props.data;
   parameters.value = dataCopyParams.value.map((param) => ({
     name: param.name,

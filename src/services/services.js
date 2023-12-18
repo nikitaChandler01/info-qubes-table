@@ -60,6 +60,7 @@ export const putNewDataToServer = async function (urlToRequestDataFromServer, da
 };
 
 export const getRoute = (base) => {
+  //TODO: здесь токен не нужен
   const token = import.meta.env.VITE_SECRET_TOKEN;
   const hostname = import.meta.env.VITE_HOSTNAME;
   const port = import.meta.env.VITE_PORT;

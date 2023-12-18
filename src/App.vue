@@ -49,14 +49,16 @@ const isLoading = ref(true);
 const toast = useToast();
 getDataFromServer(url, token)
   .then((result) => {
+    // TODO: написать логику по разным ответам сервера.
     data.value = result.response.data.scriptParameters;
     isLoading.value = false;
   })
   .catch((error) => {
+    //TODO: добавить сообщение об ошибке в случае ошибки
     console.log(error);
   });
 
-  
+
 const changeData = (newData, type, name, id) => {
   isLoading.value = true;
   newData.type.name === 'group'
@@ -64,9 +66,11 @@ const changeData = (newData, type, name, id) => {
     : (data.value[id] = newData);
   putNewDataToServer(url, data.value, token)
     .catch((error) => {
+      //TODO: добавить сообщение об ошибке в случае ошибки
       console.log(error);
     })
     .then((result) => {
+      // TODO: написать логику по разным ответам сервера.
       data.value = result.response.data.newScriptParameters.parameters;
       isLoading.value = false;
       if (type === 'Параметр') {
@@ -92,9 +96,11 @@ const addData = (newParameter, type, name, id) => {
     : (data.value[id] = newParameter);
   putNewDataToServer(url, data.value, token)
     .catch((error) => {
+      //TODO: добавить сообщение об ошибке в случае ошибки
       console.log(error);
     })
     .then((result) => {
+      // TODO: написать логику по разным ответам сервера.
       data.value = result.response.data.newScriptParameters.parameters;
       isLoading.value = false;
       if (type === 'Параметр') {
@@ -118,9 +124,11 @@ const removeRow = (id, newGroups, type, name) => {
   Object.assign(data.value, newGroups);
   putNewDataToServer(url, data.value, token)
     .catch((error) => {
+      //TODO: добавить сообщение об ошибке в случае ошибки
       console.log(error);
     })
     .then((result) => {
+      // TODO: написать логику по разным ответам сервера.
       data.value = result.response.data.newScriptParameters.parameters;
       isLoading.value = false;
       if (type === 'Параметр') {
