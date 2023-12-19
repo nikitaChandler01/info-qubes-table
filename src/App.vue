@@ -1,4 +1,8 @@
 <template>
+  <component :severity="severity" :is="currentMessage" :isLoading="isLoading">{{
+    errorMessage
+  }}</component>
+  <!-- <Message severity="error">Error Message</Message> -->
   <div class="container">
     <div class="menu-bar">
       <TabMenu :model="tables" />
@@ -24,11 +28,14 @@ import { useToast } from 'primevue/usetoast';
 import { getDataFromServer, putNewDataToServer } from '@services/index.js';
 import { ref, shallowRef } from 'vue';
 import { getRoute } from '@services/services';
+import { errorStatuses } from '@mocks/errorStatuses.js';
 
 const token = import.meta.env.VITE_SECRET_TOKEN;
 const url = getRoute('tmpParameters');
 let data = ref({});
-
+const errorMessage = ref('');
+const currentMessage = ref();
+const severity = ref('');
 const currentTab = shallowRef(ParametersPage);
 const tables = [
   {
@@ -54,19 +61,20 @@ getDataFromServer(url, token)
     isLoading.value = false;
   })
   .catch((error) => {
+    currentMessage.value = Message;
+    errorMessage.value = `${errorStatuses[error.response.status]}`;
+    severity.value = 'error';
     //TODO: добавить сообщение об ошибке в случае ошибки
     console.log(error);
   });
 
-
 const changeData = (newData, type, name, id) => {
   isLoading.value = true;
-  newData.type.name === 'group'
-    ? (data.value[id] = newData)
-    : (data.value[id] = newData);
+  newData.type.name === 'group' ? (data.value[id] = newData) : (data.value[id] = newData);
   putNewDataToServer(url, data.value, token)
     .catch((error) => {
       //TODO: добавить сообщение об ошибке в случае ошибки
+
       console.log(error);
     })
     .then((result) => {
@@ -169,5 +177,13 @@ body {
 .menu-bar {
   position: relative;
   z-index: 100;
+}
+.p-message {
+  position: absolute;
+  z-index: 999;
+  width: 50%;
+  right: 0;
+  top: -20px;
+  opacity: 0.9;
 }
 </style>

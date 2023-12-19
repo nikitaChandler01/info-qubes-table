@@ -45,7 +45,7 @@
         aria-label="Custom ProgressSpinner"
       />
     </div>
-    <div v-else="dataCopy" class="content">
+    <div v-else-if="dataCopy" class="content">
       <div class="content__tables">
         <div
           class="content__params"

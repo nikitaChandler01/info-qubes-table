@@ -23,7 +23,7 @@ const props = defineProps({
 });
 const formName = 'Форма изменения параметра'
 const editingParam = props.parameter;
-const successText = 'Изменить параметр';
+const successText = 'Сохранить';
 const cancelText = 'Закрыть форму';
 
 const emit = defineEmits(['parameterAdded', 'canceledCreating']);
@@ -42,7 +42,7 @@ const emit = defineEmits(['parameterAdded', 'canceledCreating']);
   padding: 40px;
   background: #fff;
   width: 80%;
-  height: 800px;
+  height: 700px;
   border-radius: 20px;
   border: 2px solid #949494;
 }

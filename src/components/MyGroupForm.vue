@@ -97,23 +97,6 @@ const cancel = () => {
 </script>
 
 <style scoped>
-.container {
-  z-index: 3;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 40px;
-  background: #fff;
-  width: 80%;
-  height: 800px;
-  border-radius: 20px;
-  border: 2px solid #949494;
-}
-
 .p-inputtext {
   margin-top: 10px;
   width: 100%;
@@ -124,12 +107,13 @@ const cancel = () => {
 }
 .btn-group {
   display: flex;
-  width: 440px;
+  width: 100%;
   align-items: center;
+  justify-content: flex-end;
 }
 .p-button {
   width: 200px;
-  margin-right: 20px;
+  margin-left: 20px;
 }
 .p-multiselect {
   margin-top: 10px;

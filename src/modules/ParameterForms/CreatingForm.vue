@@ -64,7 +64,7 @@ const emit = defineEmits(['parameterAdded', 'canceledCreating']);
   padding: 40px;
   background: #fff;
   width: 80%;
-  height: 800px;
+  height: 700px;
   border-radius: 20px;
   border: 2px solid #949494;
 }
